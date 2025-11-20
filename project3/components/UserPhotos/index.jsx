@@ -13,8 +13,12 @@ import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
 import { fetchPhotos } from '../../api/api.js';
+import useAppStore from '../../store/useAppStore.js';
 
-function UserPhotos({ userId, isChecked}) {
+function UserPhotos({ userId }) {
+
+  // Access isChecked from Zustand
+  const isChecked = useAppStore((s) => s.isChecked);
 
   // Set Navigation
   const navigate = useNavigate();

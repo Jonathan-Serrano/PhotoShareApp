@@ -14,8 +14,13 @@ import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
 import { fetchPhotos } from '../../api/api.js';
+import useAppStore from '../../store/useAppStore.js';
 
-function UserSinglePhoto({ userId, index, isChecked, setIsChecked}) {
+function UserSinglePhoto({ userId, index}) {
+
+  // Access isChecked and setIsChecked from Zustand
+  const isChecked = useAppStore((s) => s.isChecked);
+  const setIsChecked = useAppStore((s) => s.setIsChecked);
 
   //  Set Navigation and flag for first run
   const navigate = useNavigate();

@@ -12,8 +12,13 @@ import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
 import { fetchUser } from '../../api/api.js';
+import useAppStore from '../../store/useAppStore.js';
 
-function TopBar({isChecked, setIsChecked}) {
+function TopBar() {
+
+  // Access isChecked and toggleChecked from Zustand
+  const isChecked = useAppStore((s) => s.isChecked);
+  const toggleChecked = useAppStore((s) => s.toggleChecked);
 
   // Get user ID
   const location = useLocation();
@@ -28,11 +33,6 @@ function TopBar({isChecked, setIsChecked}) {
     queryFn: () => fetchUser(userId),
   });
 
-  // Advanced Features Toggle
-  const handleCheckboxChange = (event) => {
-    setIsChecked(event.target.checked);
-  };
-
   return (
     <AppBar className="topbar-appBar" position="absolute">
       <Toolbar sx={{justifyContent: 'space-between'}}>
@@ -41,7 +41,7 @@ function TopBar({isChecked, setIsChecked}) {
         </Typography>
         <FormGroup>
           <FormControlLabel 
-            control={<Switch color="secondary" checked={isChecked} onChange={handleCheckboxChange}/>} 
+            control={<Switch color="secondary" checked={isChecked} onChange={toggleChecked}/>} 
             label="Enable Advanced Features" 
           />
         </FormGroup>

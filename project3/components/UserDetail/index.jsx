@@ -14,8 +14,12 @@ import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
 import { fetchUser } from '../../api/api.js';
+import useAppStore from '../../store/useAppStore.js';
 
-function UserDetail({ userId, isChecked }) {
+function UserDetail({ userId }) {
+
+  // Access isChecked from Zustand
+  const isChecked = useAppStore((s) => s.isChecked);
 
   // Set Navigation
   const navigate = useNavigate();
