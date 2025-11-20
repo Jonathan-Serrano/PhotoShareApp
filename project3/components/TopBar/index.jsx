@@ -7,8 +7,10 @@ import {
   AppBar,
   Toolbar,
   Typography,
+  Box
 } from '@mui/material';
 import { useQuery } from "@tanstack/react-query";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 import './styles.css';
 import { fetchUser } from '../../api/api.js';
@@ -35,21 +37,27 @@ function TopBar() {
 
   return (
     <AppBar className="topbar-appBar" position="absolute">
-      <Toolbar sx={{justifyContent: 'space-between'}}>
-        <Typography variant="h5" color="inherit" >
-          Jonathan Serrano and Benjamin Ly
-        </Typography>
-        <FormGroup>
-          <FormControlLabel 
-            control={<Switch color="secondary" checked={isChecked} onChange={toggleChecked}/>} 
-            label="Enable Advanced Features" 
-          />
-        </FormGroup>
-        <Typography variant="h5" color="inherit">
-          {parsedPath.includes("photos") && userId ? `Photos of ${userDetails.first_name} ${userDetails.last_name}` : ''}
-          {!(parsedPath.includes("photos") || parsedPath.includes("comments")) && userId ? `${userDetails.first_name} ${userDetails.last_name}` : ''}
-          {parsedPath.includes("comments") && userId ? `Comments of ${userDetails.first_name} ${userDetails.last_name}` : ''}
-        </Typography>
+      <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h5" color="inherit" >
+            Hi 
+          </Typography>
+          <FormGroup>
+            <FormControlLabel 
+              control={<Switch color="secondary" checked={isChecked} onChange={toggleChecked}/>} 
+              label="Enable Advanced Features" 
+            />
+          </FormGroup>
+        </Box>
+        <Box sx={{ flexGrow: 1 }} />
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h5" color="inherit">
+            {parsedPath.includes("photos") && userId ? `Photos of ${userDetails.first_name} ${userDetails.last_name}` : ''}
+            {!(parsedPath.includes("photos") || parsedPath.includes("comments")) && userId ? `${userDetails.first_name} ${userDetails.last_name}` : ''}
+            {parsedPath.includes("comments") && userId ? `Comments of ${userDetails.first_name} ${userDetails.last_name}` : ''}
+          </Typography>
+          <LogoutIcon />
+        </Box>
       </Toolbar>
     </AppBar>
   );
