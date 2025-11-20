@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from 'react-dom/client';
 import { Grid, Paper } from '@mui/material';
 import {
-  BrowserRouter, Route, Routes, useParams,
+  BrowserRouter, Route, Routes, useParams, Navigate,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -17,6 +17,7 @@ import UserPhotos from './components/UserPhotos';
 import UserSinglePhoto from './components/UserSinglePhoto';
 import UserComments from './components/UserComments';
 import useAppStore from './store/useAppStore.js';
+import LoginRegister from './components/LoginRegister'
 
 const queryClient = new QueryClient();
 
@@ -42,7 +43,7 @@ function UserCommentsRoute() {
 
 function PhotoShare() {
 
-  const isChecked = useAppStore((s) => s.isChecked);
+  const isLoggedIn = useAppStore((s) => s.isLoggedIn);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -53,20 +54,23 @@ function PhotoShare() {
               <TopBar />
             </Grid>
             <div className="main-topbar-buffer"/>
-            <Grid item sm={3}>
+            {isLoggedIn ? ( <Grid item sm={3}>
               <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
-                <UserList />
+                {<UserList />}
               </Paper>
-            </Grid>
-            <Grid item sm={9}>
+            </Grid>) : (
+              <></>
+            )}
+            <Grid item sm={isLoggedIn ? 9 : 12}>
               <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
                 <Routes>
-                  <Route path="/" />
-                  <Route path="/users/:userId" element={<UserDetailRoute />} />
-                  <Route path="/photos/:userId/:index" element={<UserSinglePhotoRoute />} />
-                  <Route path="/photos/:userId" element={<UserPhotosRoute />} />
-                  <Route path="/comments/:userId" element={<UserCommentsRoute />} />
-                  <Route path="/users" element={<UserList />} />
+                  <Route path="/" element={isLoggedIn ? <></> :  <Navigate to="/login" /> }/>
+                  <Route path="/login" element={ <LoginRegister /> }/>
+                  <Route path="/users/:userId" element={isLoggedIn ? <UserDetailRoute /> : <Navigate to="/login" />} />
+                  <Route path="/photos/:userId/:index" element={isLoggedIn ? <UserSinglePhotoRoute /> :  <Navigate to="/login" />} />
+                  <Route path="/photos/:userId" element={isLoggedIn ? <UserPhotosRoute /> :  <Navigate to="/login" />} />
+                  <Route path="/comments/:userId" element={isLoggedIn ? <UserCommentsRoute /> :  <Navigate to="/login" />} />
+                  <Route path="/users" element={isLoggedIn ? <UserList /> :  <Navigate to="/login" />} />
                 </Routes>
               </Paper>
             </Grid>
