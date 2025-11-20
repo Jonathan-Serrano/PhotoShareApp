@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from 'react-dom/client';
 import { Grid, Paper } from '@mui/material';
@@ -16,32 +16,33 @@ import UserList from './components/UserList';
 import UserPhotos from './components/UserPhotos';
 import UserSinglePhoto from './components/UserSinglePhoto';
 import UserComments from './components/UserComments';
+import useAppStore from './store/useAppStore.js';
 
 const queryClient = new QueryClient();
 
-function UserDetailRoute({isChecked}) {
+function UserDetailRoute() {
   const { userId } = useParams();
-  return <UserDetail userId={userId} isChecked={isChecked}/>;
+  return <UserDetail userId={userId} />;
 }
 
-function UserPhotosRoute({isChecked}) {
+function UserPhotosRoute() {
   const { userId } = useParams();
-  return <UserPhotos userId={userId} isChecked={isChecked}/>;
+  return <UserPhotos userId={userId} />;
 }
 
-function UserSinglePhotoRoute({isChecked, setIsChecked}) {
+function UserSinglePhotoRoute() {
   const { userId, index } = useParams();
-  return <UserSinglePhoto userId={userId} index={index} isChecked={isChecked} setIsChecked={setIsChecked}/>;
+  return <UserSinglePhoto userId={userId} index={index} />;
 }
 
-function UserCommentsRoute({isChecked}) {
+function UserCommentsRoute() {
   const { userId } = useParams();
-  return <UserComments userId={userId} isChecked={isChecked} />;
+  return <UserComments userId={userId} />;
 }
 
 function PhotoShare() {
 
-  const [isChecked, setIsChecked] = useState(false);
+  const isChecked = useAppStore((s) => s.isChecked);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -49,22 +50,22 @@ function PhotoShare() {
         <div>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <TopBar isChecked={isChecked} setIsChecked={setIsChecked} />
+              <TopBar />
             </Grid>
             <div className="main-topbar-buffer"/>
             <Grid item sm={3}>
               <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
-                <UserList isChecked={isChecked} setIsChecked={setIsChecked}/>
+                <UserList />
               </Paper>
             </Grid>
             <Grid item sm={9}>
               <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
                 <Routes>
                   <Route path="/" />
-                  <Route path="/users/:userId" element={<UserDetailRoute isChecked={isChecked} />} />
-                  <Route path="/photos/:userId/:index" element={<UserSinglePhotoRoute isChecked={isChecked} setIsChecked={setIsChecked} />} />
-                  <Route path="/photos/:userId" element={<UserPhotosRoute isChecked={isChecked} />} />
-                  <Route path="/comments/:userId" element={<UserCommentsRoute isChecked={isChecked}/>} />
+                  <Route path="/users/:userId" element={<UserDetailRoute />} />
+                  <Route path="/photos/:userId/:index" element={<UserSinglePhotoRoute />} />
+                  <Route path="/photos/:userId" element={<UserPhotosRoute />} />
+                  <Route path="/comments/:userId" element={<UserCommentsRoute />} />
                   <Route path="/users" element={<UserList />} />
                 </Routes>
               </Paper>
