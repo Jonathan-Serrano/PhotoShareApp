@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
 import {
   Divider,
   List,
@@ -10,58 +9,38 @@ import {
   Typography,
   Chip,
 } from '@mui/material';
+import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
+import { fetchUsers, fetchPhotoCounts, fetchCommentCounts } from '../../api/api.js';
 
 function UserList({ isChecked }) {
 
-  // Set Navigation and hooks
+  // Set Navigation
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-  const [photoCounts, setPhotoCounts] = useState({});
-  const [commentCounts, setCommentCounts] = useState({});
 
-  useEffect(() => {
-    // Fetch user list
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get('http://localhost:3001/user/list');
-        setUsers(res.data || []);
-      } catch (err) {
-        console.error('Error:', err);
-      }
-    };
-    fetchUsers();
-  }, []);
+  // Fetch user list
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => fetchUsers(),
+  });
+  
+  // Only fetch photo counts if users exist and checkbox is checked
+  const shouldFetch = users.length > 0 && isChecked;
 
+  // Fetch photo counts
+  const { data: photoCounts = {}, isLoading: photoLoading } = useQuery({
+    queryKey: ['photoCounts'],
+    queryFn: fetchPhotoCounts,
+    enabled: shouldFetch, 
+  });
 
-  useEffect(() => {
-
-    // Get Counts if the checkbox is checked and there are users
-    if (users.length > 0 && isChecked) {
-      // Fetch photo counts
-      const fetchPhotoCounts= async () => {
-        try {
-          const res = await axios.get('http://localhost:3001/getUsersPhotoCount');
-          setPhotoCounts(res.data || {});
-        } catch (err) {
-          console.error('Error:', err);
-        }
-      };
-      fetchPhotoCounts();
-
-      // Fetch comment counts
-      const fetchCommentCounts = async () => {
-        try {
-          const res = await axios.get('http://localhost:3001/getUsersCommentCount');
-          setCommentCounts(res.data || {});
-        } catch (err) {
-          console.error('Error:', err);
-        }
-      };
-      fetchCommentCounts();
-    }
-  }, [isChecked, users]);
+  // Fetch comment counts
+  const { data: commentCounts = {}, isLoading: commentLoading } = useQuery({
+    queryKey: ['commentCounts'],
+    queryFn: fetchCommentCounts,
+    enabled: shouldFetch,
+  });
 
   // Navigate to user details page
   const goToUserDetailsPage = (userId) => {

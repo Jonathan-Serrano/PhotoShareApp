@@ -1,9 +1,7 @@
-import React, { useState, useEffect }  from 'react';
+import React, { useEffect }  from 'react';
 import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
-import axios from 'axios';
-import './styles.css';
 import {
   Typography,
   List,
@@ -14,26 +12,21 @@ import {
   Avatar,
   Divider,
 } from '@mui/material';
+import { useQuery } from "@tanstack/react-query";
 
+import './styles.css';
+import { fetchComments } from '../../api/api.js';
 
 function UserComments({ userId, isChecked }) {
 
-    // Navigation and hook for comment details
+    // Set Navigation
     const navigate = useNavigate();
-    const [commentDeatils, setCommentDeatils] = useState([]);
 
-    useEffect(() => {
-        // Fetch user comment details
-        const fetchComments = async () => {
-          try {
-            const res = await axios.get(`http://localhost:3001/getUsersCommentDetails/${encodeURIComponent(userId)}`);
-            setCommentDeatils(res.data || []);
-          } catch (err) {
-            console.error('Error:', err);
-          }
-        };
-        fetchComments();
-    }, [userId]);
+    // Fetch user comment details
+    const { data: commentDetails = [], isLoading, error } = useQuery({
+        queryKey: ["commentDetails", userId],
+        queryFn: () => fetchComments(userId),
+    });
 
     // If advanced mode is not checked, navigate to user page
     useEffect(() => {
@@ -49,7 +42,7 @@ function UserComments({ userId, isChecked }) {
 
     return ( 
         <List>
-            {commentDeatils.map((comment, index) => (
+            {commentDetails.map((comment, index) => (
                 <React.Fragment key={index}>
                     <ListItemButton onClick={(event) => goToPhotoPage(event, comment.photo_user_id, comment.photo_index)}>
                         <ListItem alignItems="flex-start">

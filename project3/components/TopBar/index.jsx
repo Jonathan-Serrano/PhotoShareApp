@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation } from "react-router-dom";
-import axios from 'axios';
-import './styles.css';
 import {
   FormGroup,
   FormControlLabel,
@@ -10,34 +8,25 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { useQuery } from "@tanstack/react-query";
+
+import './styles.css';
+import { fetchUser } from '../../api/api.js';
 
 function TopBar({isChecked, setIsChecked}) {
 
   // Get user ID
   const location = useLocation();
   const parsedPath = location.pathname.split('/');
-  const userID = (parsedPath.includes("photos") && parsedPath.length < 4) || parsedPath.includes("users") || parsedPath.includes("comments")
+  const userId = (parsedPath.includes("photos") && parsedPath.length < 4) || parsedPath.includes("users") || parsedPath.includes("comments")
                 ? parsedPath[parsedPath.length - 1]
                 : (parsedPath.length >= 4) ? parsedPath[parsedPath.length - 2] : null;
 
-  // Hook for user details
-  const [UserDetails, setUserDetails] = useState([]);
-
-  useEffect(() => {
-    // Fetch user details
-    if (userID) {
-      const fetchUser = async () => {
-        try {
-          const res = await axios.get(`http://localhost:3001/user/${encodeURIComponent(userID)}`);
-          setUserDetails(res.data || {});
-        } catch (err) {
-          console.error('Error:', err);
-        }
-      };
-      fetchUser();
-    }
-
-  }, [userID]);
+  // Fetch user details
+  const { data: userDetails = {}, isLoading, error } = useQuery({
+    queryKey: ["userDetails", userId],
+    queryFn: () => fetchUser(userId),
+  });
 
   // Advanced Features Toggle
   const handleCheckboxChange = (event) => {
@@ -48,7 +37,7 @@ function TopBar({isChecked, setIsChecked}) {
     <AppBar className="topbar-appBar" position="absolute">
       <Toolbar sx={{justifyContent: 'space-between'}}>
         <Typography variant="h5" color="inherit" >
-          Jonathan Serrano
+          Jonathan Serrano and Benjamin Ly
         </Typography>
         <FormGroup>
           <FormControlLabel 
@@ -57,9 +46,9 @@ function TopBar({isChecked, setIsChecked}) {
           />
         </FormGroup>
         <Typography variant="h5" color="inherit">
-          {parsedPath.includes("photos") && userID ? `Photos of ${UserDetails.first_name} ${UserDetails.last_name}` : ''}
-          {!(parsedPath.includes("photos") || parsedPath.includes("comments")) && userID ? `${UserDetails.first_name} ${UserDetails.last_name}` : ''}
-          {parsedPath.includes("comments") && userID ? `Comments of ${UserDetails.first_name} ${UserDetails.last_name}` : ''}
+          {parsedPath.includes("photos") && userId ? `Photos of ${userDetails.first_name} ${userDetails.last_name}` : ''}
+          {!(parsedPath.includes("photos") || parsedPath.includes("comments")) && userId ? `${userDetails.first_name} ${userDetails.last_name}` : ''}
+          {parsedPath.includes("comments") && userId ? `Comments of ${userDetails.first_name} ${userDetails.last_name}` : ''}
         </Typography>
       </Toolbar>
     </AppBar>

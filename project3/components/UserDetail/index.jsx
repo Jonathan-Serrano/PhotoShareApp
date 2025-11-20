@@ -1,9 +1,8 @@
-import React, { useState, useEffect }  from 'react';
+import React from 'react';
 import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
 
-import axios from 'axios';
 import {
   Box,
   Card,
@@ -11,28 +10,21 @@ import {
   Button,
   Typography,
 } from '@mui/material';
+import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
+import { fetchUser } from '../../api/api.js';
 
 function UserDetail({ userId, isChecked }) {
 
-  // Set Navigation and Hook for user details
+  // Set Navigation
   const navigate = useNavigate();
-  const [userDetails, setUserDetails] = useState({});
 
-  useEffect(() => {
-    // Fetch user details
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get(`http://localhost:3001/user/${encodeURIComponent(userId)}`);
-        setUserDetails(res.data || {});
-      } catch (err) {
-        console.error('Error:', err);
-      }
-    };
-    fetchUser();
-
-  }, [userId]);
+  // Fetch user details
+  const { data: userDetails = {}, isLoading, error } = useQuery({
+    queryKey: ["userDetails", userId],
+    queryFn: () => fetchUser(userId),
+  });
 
   // Navigate to user photos page
   const viewPhotos = () => {

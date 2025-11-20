@@ -5,6 +5,7 @@ import { Grid, Paper } from '@mui/material';
 import {
   BrowserRouter, Route, Routes, useParams,
 } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import './styles/main.css';
 // Import mock setup - Remove this once you have implemented the actual API calls
@@ -16,7 +17,7 @@ import UserPhotos from './components/UserPhotos';
 import UserSinglePhoto from './components/UserSinglePhoto';
 import UserComments from './components/UserComments';
 
-
+const queryClient = new QueryClient();
 
 function UserDetailRoute({isChecked}) {
   const { userId } = useParams();
@@ -43,33 +44,35 @@ function PhotoShare() {
   const [isChecked, setIsChecked] = useState(false);
 
   return (
-    <BrowserRouter>
-      <div>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TopBar isChecked={isChecked} setIsChecked={setIsChecked} />
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <div>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TopBar isChecked={isChecked} setIsChecked={setIsChecked} />
+            </Grid>
+            <div className="main-topbar-buffer"/>
+            <Grid item sm={3}>
+              <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
+                <UserList isChecked={isChecked} setIsChecked={setIsChecked}/>
+              </Paper>
+            </Grid>
+            <Grid item sm={9}>
+              <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
+                <Routes>
+                  <Route path="/" />
+                  <Route path="/users/:userId" element={<UserDetailRoute isChecked={isChecked} />} />
+                  <Route path="/photos/:userId/:index" element={<UserSinglePhotoRoute isChecked={isChecked} setIsChecked={setIsChecked} />} />
+                  <Route path="/photos/:userId" element={<UserPhotosRoute isChecked={isChecked} />} />
+                  <Route path="/comments/:userId" element={<UserCommentsRoute isChecked={isChecked}/>} />
+                  <Route path="/users" element={<UserList />} />
+                </Routes>
+              </Paper>
+            </Grid>
           </Grid>
-          <div className="main-topbar-buffer"/>
-          <Grid item sm={3}>
-            <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
-              <UserList isChecked={isChecked} setIsChecked={setIsChecked}/>
-            </Paper>
-          </Grid>
-          <Grid item sm={9}>
-            <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
-              <Routes>
-                <Route path="/" />
-                <Route path="/users/:userId" element={<UserDetailRoute isChecked={isChecked} />} />
-                <Route path="/photos/:userId/:index" element={<UserSinglePhotoRoute isChecked={isChecked} setIsChecked={setIsChecked} />} />
-                <Route path="/photos/:userId" element={<UserPhotosRoute isChecked={isChecked} />} />
-                <Route path="/comments/:userId" element={<UserCommentsRoute isChecked={isChecked}/>} />
-                <Route path="/users" element={<UserList />} />
-              </Routes>
-            </Paper>
-          </Grid>
-        </Grid>
-      </div>
-    </BrowserRouter>
+        </div>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
