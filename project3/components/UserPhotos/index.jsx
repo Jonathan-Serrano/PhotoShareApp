@@ -1,9 +1,7 @@
-import React, { useState, useEffect }  from 'react';
+import React, { useEffect }  from 'react';
 import { Link, useNavigate } from "react-router-dom";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
-import axios from 'axios';
-import './styles.css';
 import {
   Box,
   Card,
@@ -11,26 +9,21 @@ import {
   CardContent,
   Typography,
 } from '@mui/material';
+import { useQuery } from "@tanstack/react-query";
+
+import './styles.css';
+import { fetchPhotos } from '../../api/api.js';
 
 function UserPhotos({ userId, isChecked}) {
 
-  // Hook and for photos and navigation
-  const [photos, setPhotos] = useState([]);
+  // Set Navigation
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Fetch user photos
-    const fetchPhotos = async () => {
-      try {
-        const res = await axios.get(`http://localhost:3001/photosOfUser/${encodeURIComponent(userId)}`);
-        setPhotos(res.data || []);
-      } catch (err) {
-        console.error('Error:', err);
-      }
-    };
-    fetchPhotos();
-  }, []);
-
+  // Fetch user photos
+  const { data: photos = [], isLoading, error } = useQuery({
+    queryKey: ["photos", userId],
+    queryFn: () => fetchPhotos(userId),
+  });
 
   useEffect(() => {
     // Navigate to first photo if advanced features is on

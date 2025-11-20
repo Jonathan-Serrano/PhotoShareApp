@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef }  from 'react';
 import { useNavigate, Link } from "react-router-dom";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
-import axios from 'axios';
-import './styles.css';
 import {
   Box,
   Card,
@@ -12,28 +10,25 @@ import {
   Typography,
   Pagination,
 } from '@mui/material';
+import { useQuery } from "@tanstack/react-query";
+
+import './styles.css';
+import { fetchPhotos } from '../../api/api.js';
 
 function UserSinglePhoto({ userId, index, isChecked, setIsChecked}) {
 
-  //  Set Navigation, hooks for photos, and flag for first run
+  //  Set Navigation and flag for first run
   const navigate = useNavigate();
-  const [photo, setPhoto] = useState({});
-  const [photoLength, setPhotoLength] = useState(0);
   const firstRun = useRef(true);
 
-  useEffect(() => {
-    // Fetch user photos
-    const fetchPhoto = async () => {
-      try {
-        const res = await axios.get(`http://localhost:3001/photosOfUser/${encodeURIComponent(userId)}`);
-        setPhoto(res.data[index - 1] || {});
-        setPhotoLength(res.data.length || 0);
-      } catch (err) {
-        console.error('Error:', err);
-      }
-    };
-    fetchPhoto();
-  }, [index]);
+  // Fetch user photos
+  const { data: photos = [], isLoading, error } = useQuery({
+    queryKey: ["photos", userId],
+    queryFn: () => fetchPhotos(userId),
+  });
+
+  const photo = photos?.[index - 1] || {};
+  const photoLength = photos?.length || 0;
 
   // For Moving between pages
   const handlePageChange = (event, value) => {

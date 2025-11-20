@@ -22,7 +22,8 @@ import SchemaInfo from "./schema/schemaInfo.js";
 
 mongoose.Promise = bluebird;
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://127.0.0.1/project2", {
+const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/project3";
+mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -50,6 +51,8 @@ Promise.all(removePromises)
         location: user.location,
         description: user.description,
         occupation: user.occupation,
+        login_name: user.last_name.toLowerCase(),
+        password: "weak",
       })
         .then(function (userObj) {
           // Set the unique ID of the object. We use the MongoDB generated _id
