@@ -34,7 +34,7 @@ export const fetchPhotos = async (userId) => {
 
 export const fetchComments = async (userId) => {
   try {
-    const res = await api.get(`/getUsersCommentDetails/${encodeURIComponent(userId)}`);
+    const res = await api.get(`/usersCommentDetails/${encodeURIComponent(userId)}`);
     return res.data;
   } catch (err) {
     console.error('Error:', err);
@@ -43,7 +43,7 @@ export const fetchComments = async (userId) => {
 
 export const fetchPhotoCounts = async () => {
   try {
-    const res = await api.get('/getUsersPhotoCount');
+    const res = await api.get('/usersPhotoCounts');
     return res.data;
   } catch (err) {
     console.error('Error:', err);
@@ -52,7 +52,7 @@ export const fetchPhotoCounts = async () => {
 
 export const fetchCommentCounts = async () => {
   try {
-    const res = await api.get('/getUsersCommentCount');
+    const res = await api.get('/usersCommentCounts');
     return res.data;
   } catch (err) {
     console.error('Error:', err);

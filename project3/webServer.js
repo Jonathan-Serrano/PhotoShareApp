@@ -185,9 +185,9 @@ app.get('/photosOfUser/:id', async (request, response) => {
 
 
 /**
- * URL /getUsersPhotoCount - Returns the Photos Counts for all User objects.
+ * URL /usersPhotoCount - Returns the Photos Counts for all User objects.
  */
-app.get('/getUsersPhotoCount', async (request, response) => {
+app.get('/usersPhotoCount', async (request, response) => {
 
   try {
 
@@ -219,9 +219,9 @@ app.get('/getUsersPhotoCount', async (request, response) => {
 });
 
 /**
- * URL /getUsersCommentCount - Returns the Comments Counts for all User objects.
+ * URL /usersCommentCount - Returns the Comments Counts for all User objects.
  */
-app.get('/getUsersCommentCount', async (request, response) => {
+app.get('/usersCommentCount', async (request, response) => {
   try {
 
     // Get all user IDs
@@ -253,9 +253,9 @@ app.get('/getUsersCommentCount', async (request, response) => {
 });
 
 /**
- * URL /getUsersCommentDetails - Returns the Comments Details for given user id.
+ * URL /usersCommentDetails - Returns the Comments Details for given user id.
  */
-app.get('/getUsersCommentDetails/:id', async (request, response) => {
+app.get('/usersCommentDetails/:id', async (request, response) => {
   try {
     const userId = request.params.id;
 
