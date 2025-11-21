@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: "http://localhost:3001",
+  withCredentials: true  
 })
 
 // ------------ GET REQUESTS ------------
@@ -53,6 +54,18 @@ export const fetchPhotoCounts = async () => {
 export const fetchCommentCounts = async () => {
   try {
     const res = await api.get('/getUsersCommentCount');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+  }
+}
+
+export const loginToAccount = async (loginName) => {
+  try {
+    console.log(loginName)
+     const res = await api.post('/admin/login', {
+      login_name: loginName
+    });
     return res.data;
   } catch (err) {
     console.error('Error:', err);

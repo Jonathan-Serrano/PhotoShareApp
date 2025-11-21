@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import {
   Container,
@@ -6,22 +6,46 @@ import {
   Box,
   TextField,
   Button,
+  Grid,
+  Link,
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+
 
 import './styles.css';
-import { fetchUsers, fetchPhotoCounts, fetchCommentCounts } from '../../api/api.js';
+import { loginToAccount } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function LoginRegister() {
+
+  // Set Navigation
+  const navigate = useNavigate();
+  const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
+  const setUserInfo = useAppStore((s) => s.setUserInfo);
+
+  // const [userId, setUserId] = useState('');
+
+  const login = useMutation({
+    mutationFn: (loginName) => loginToAccount(loginName),
+    onSuccess: (data) => {
+      console.log("Logged in!", data);
+      setUserInfo(data);
+      setIsLoggedIn(true);
+      navigate(`/users/${encodeURIComponent(data._id)}`);
+    },
+    onError: (err) => {
+      console.error("Login failed:", err);
+    }
+  });
+
   const handleSubmit = (event) => {
-    // event.preventDefault();
-    // const data = new FormData(event.currentTarget);
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
     // console.log({
     //   email: data.get('email'),
     //   password: data.get('password'),
     // });
-    console.log("hi")
+    login.mutate(data.get('loginName'))
   };
 
 
@@ -35,13 +59,13 @@ function LoginRegister() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="loginName"
+              label="Login Name"
+              name="loginName"
+              // autoComplete="email"
               autoFocus
             />
-            <TextField
+            {/* <TextField
               margin="normal"
               required
               fullWidth
@@ -50,7 +74,7 @@ function LoginRegister() {
               type="password"
               id="password"
               autoComplete="current-password"
-            />
+            /> */}
             <Button
               type="submit"
               fullWidth
@@ -59,6 +83,11 @@ function LoginRegister() {
             >
               Sign In
             </Button>
+             <Grid item>
+                <Link href="#" variant="body2">
+                  {"Don't have an account? Sign Up"}
+                </Link>
+              </Grid>
           </Box>
       </Container>
   );

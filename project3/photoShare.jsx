@@ -44,6 +44,7 @@ function UserCommentsRoute() {
 function PhotoShare() {
 
   const isLoggedIn = useAppStore((s) => s.isLoggedIn);
+  const userInfo = useAppStore((s) => s.userInfo);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -64,8 +65,8 @@ function PhotoShare() {
             <Grid item sm={isLoggedIn ? 9 : 12}>
               <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
                 <Routes>
-                  <Route path="/" element={isLoggedIn ? <></> :  <Navigate to="/login" /> }/>
-                  <Route path="/login" element={ <LoginRegister /> }/>
+                  <Route path="/" element={isLoggedIn ? <Navigate to={`/users/${encodeURIComponent(userInfo._id)}`} /> :  <Navigate to="/login" /> }/>
+                  <Route path="/login" element={isLoggedIn ? <Navigate to={`/users/${encodeURIComponent(userInfo._id)}`} /> : <LoginRegister /> }/>
                   <Route path="/users/:userId" element={isLoggedIn ? <UserDetailRoute /> : <Navigate to="/login" />} />
                   <Route path="/photos/:userId/:index" element={isLoggedIn ? <UserSinglePhotoRoute /> :  <Navigate to="/login" />} />
                   <Route path="/photos/:userId" element={isLoggedIn ? <UserPhotosRoute /> :  <Navigate to="/login" />} />
