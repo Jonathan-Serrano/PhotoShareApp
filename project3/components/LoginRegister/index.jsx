@@ -41,10 +41,6 @@ function LoginRegister() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // console.log({
-    //   email: data.get('email'),
-    //   password: data.get('password'),
-    // });
     login.mutate(data.get('loginName'))
   };
 

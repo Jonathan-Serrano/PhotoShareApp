@@ -28,6 +28,7 @@ function UserDetail({ userId }) {
   const { data: userDetails = {}, isLoading, error } = useQuery({
     queryKey: ["userDetails", userId],
     queryFn: () => fetchUser(userId),
+    enabled: !!userId,
   });
 
   // Navigate to user photos page

@@ -34,7 +34,7 @@ function TopBar() {
   const { data: userDetails = {}, isLoading, error } = useQuery({
     queryKey: ["userDetails", userId],
     queryFn: () => fetchUser(userId),
-    enabled: isLoggedIn,
+    enabled: isLoggedIn && !!userId
   });
 
   return (
@@ -44,7 +44,7 @@ function TopBar() {
         <>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="h5" color="inherit" >
-              Hi 
+              Hi {userDetails.first_name}
             </Typography>
             <FormGroup>
               <FormControlLabel 

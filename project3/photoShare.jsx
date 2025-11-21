@@ -72,6 +72,7 @@ function PhotoShare() {
                   <Route path="/photos/:userId" element={isLoggedIn ? <UserPhotosRoute /> :  <Navigate to="/login" />} />
                   <Route path="/comments/:userId" element={isLoggedIn ? <UserCommentsRoute /> :  <Navigate to="/login" />} />
                   <Route path="/users" element={isLoggedIn ? <UserList /> :  <Navigate to="/login" />} />
+                  <Route path="/*" element={isLoggedIn ? <Navigate to={`/users/${encodeURIComponent(userInfo._id)}`} /> :  <Navigate to="/login" /> }/>
                 </Routes>
               </Paper>
             </Grid>
