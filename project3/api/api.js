@@ -69,5 +69,6 @@ export const loginToAccount = async (loginName) => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+    throw err;
   }
 }

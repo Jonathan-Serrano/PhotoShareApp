@@ -8,6 +8,7 @@ import {
   Button,
   Grid,
   Link,
+  Alert
 } from '@mui/material';
 import { useMutation } from "@tanstack/react-query";
 
@@ -22,12 +23,14 @@ function LoginRegister() {
   const navigate = useNavigate();
   const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
   const setUserInfo = useAppStore((s) => s.setUserInfo);
+  const [loginFailed, setLoginFailed] = useState(false);
 
   // const [userId, setUserId] = useState('');
 
   const login = useMutation({
     mutationFn: (loginName) => loginToAccount(loginName),
     onSuccess: (data) => {
+      setLoginFailed(false)
       console.log("Logged in!", data);
       setUserInfo(data);
       setIsLoggedIn(true);
@@ -35,6 +38,7 @@ function LoginRegister() {
     },
     onError: (err) => {
       console.error("Login failed:", err);
+      setLoginFailed(true)
     }
   });
 
@@ -79,11 +83,12 @@ function LoginRegister() {
             >
               Sign In
             </Button>
-             <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
+            {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">Please enter a valid user</Alert> : <></> }
+            <Grid item>
+              <Link href="#" variant="body2">
+                {"Don't have an account? Sign Up"}
+              </Link>
+            </Grid>
           </Box>
       </Container>
   );
