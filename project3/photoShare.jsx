@@ -6,7 +6,7 @@ import {
   BrowserRouter, Route, Routes, useParams, Navigate,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
+import { getCurrentUser } from '/api/api.js';
 import './styles/main.css';
 // Import mock setup - Remove this once you have implemented the actual API calls
 // import './lib/mockSetup.js';
@@ -45,6 +45,20 @@ function PhotoShare() {
 
   const isLoggedIn = useAppStore((s) => s.isLoggedIn);
   const userInfo = useAppStore((s) => s.userInfo);
+  const setUserInfo = useAppStore((s) => s.setUserInfo);
+  const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
+
+  useEffect(() => {
+    const CheckSession = async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        setUserInfo(user);
+        setIsLoggedIn(true);
+      }
+    }
+    CheckSession();
+
+  }, []); 
 
   return (
     <QueryClientProvider client={queryClient}>

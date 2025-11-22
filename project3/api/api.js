@@ -62,10 +62,19 @@ export const fetchCommentCounts = async () => {
 
 export const loginToAccount = async (loginName) => {
   try {
-    console.log(loginName)
-     const res = await api.post('/admin/login', {
+    const res = await api.post('/admin/login', {
       login_name: loginName
     });
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+}
+
+export const getCurrentUser = async () => {
+  try {
+    const res = await api.get('/admin/currentUser');
     return res.data;
   } catch (err) {
     console.error('Error:', err);

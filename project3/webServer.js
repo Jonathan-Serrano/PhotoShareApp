@@ -30,7 +30,7 @@ app.use(express.json());
 
 // Enable CORS for all routes
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:3000' || '*');
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
@@ -44,14 +44,15 @@ app.use((req, res, next) => {
 app.use(session({
   secret: 'none',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: { secure: false }
 }));
 
 function requireLogin(req, res, next) {
   if (!req.session.user) {
     return res.status(401).json({ error: "Not logged in" });
   }
-  next();
+  return next();
 }
 
 mongoose.Promise = bluebird;
@@ -348,6 +349,18 @@ app.post("/admin/login", async (request, response) => {
 
   } catch (err) {
     return response.status(500).json({ error: 'login error' });
+  }
+});
+
+app.get("/admin/currentUser", async (request, response) => {
+  try {
+    const user = await User.findById(request.session.user._id).select('_id first_name')
+    if (!user) {
+      return response.status(400).send({ error: 'No user found' });
+    }
+    return response.status(200).send(user);
+  } catch (err) {
+    return response.status(500).send({ error: 'Server error' });
   }
 });
 
