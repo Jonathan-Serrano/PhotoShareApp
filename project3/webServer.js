@@ -380,7 +380,7 @@ app.post("/admin/logout", (req, res) => {
 
     res.clearCookie("connect.sid");
 
-    return res.status(200).json({ message: "USer logged out successfully" });
+    return res.status(200).json({ message: "User logged out successfully" });
   });
   } catch (err) {
     return response.status(500).send({ error: 'Server error' });
