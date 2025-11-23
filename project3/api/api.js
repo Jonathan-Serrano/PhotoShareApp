@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: "http://localhost:3001",
+  withCredentials: true  
 })
 
 // ------------ GET REQUESTS ------------
@@ -56,5 +57,37 @@ export const fetchCommentCounts = async () => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+  }
+}
+
+export const loginToAccount = async (loginName) => {
+  try {
+    const res = await api.post('/admin/login', {
+      login_name: loginName
+    });
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+}
+
+export const getCurrentUser = async () => {
+  try {
+    const res = await api.get('/admin/currentUser');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+}
+
+export const logoutOfAccount = async () => {
+  try {
+    const res = await api.post('/admin/logout');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
   }
 }

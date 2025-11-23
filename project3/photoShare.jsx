@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import ReactDOM from 'react-dom/client';
 import { Grid, Paper } from '@mui/material';
 import {
-  BrowserRouter, Route, Routes, useParams,
+  BrowserRouter, Route, Routes, useParams, Navigate,
 } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
+import { getCurrentUser } from './api/api.js';
 import './styles/main.css';
 // Import mock setup - Remove this once you have implemented the actual API calls
 // import './lib/mockSetup.js';
@@ -17,6 +17,7 @@ import UserPhotos from './components/UserPhotos';
 import UserSinglePhoto from './components/UserSinglePhoto';
 import UserComments from './components/UserComments';
 import useAppStore from './store/useAppStore.js';
+import LoginRegister from './components/LoginRegister'
 
 const queryClient = new QueryClient();
 
@@ -41,8 +42,33 @@ function UserCommentsRoute() {
 }
 
 function PhotoShare() {
+  const isLoggedIn = useAppStore((s) => s.isLoggedIn);
+  const userInfo = useAppStore((s) => s.userInfo);
+  const setUserInfo = useAppStore((s) => s.setUserInfo);
+  const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const isChecked = useAppStore((s) => s.isChecked);
+  useEffect(() => {
+    const CheckSession = async () => {
+      try {
+        const user = await getCurrentUser();
+        console.log(user);
+        if (user) {
+          setUserInfo(user);
+          setIsLoggedIn(true);
+        }
+      } catch (err) {
+        console.error("Session check failed:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    CheckSession();
+  }, [setUserInfo, setIsLoggedIn]); 
+
+  if (isLoading) {
+    return (<div>Loading...</div>)
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -53,20 +79,24 @@ function PhotoShare() {
               <TopBar />
             </Grid>
             <div className="main-topbar-buffer"/>
-            <Grid item sm={3}>
+            {isLoggedIn ? ( <Grid item sm={3}>
               <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
-                <UserList />
+                {<UserList />}
               </Paper>
-            </Grid>
-            <Grid item sm={9}>
+            </Grid>) : (
+              <></>
+            )}
+            <Grid item sm={isLoggedIn ? 9 : 12}>
               <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
                 <Routes>
-                  <Route path="/" />
-                  <Route path="/users/:userId" element={<UserDetailRoute />} />
-                  <Route path="/photos/:userId/:index" element={<UserSinglePhotoRoute />} />
-                  <Route path="/photos/:userId" element={<UserPhotosRoute />} />
-                  <Route path="/comments/:userId" element={<UserCommentsRoute />} />
-                  <Route path="/users" element={<UserList />} />
+                  <Route path="/login" element={isLoggedIn ? <Navigate to={`/users/${encodeURIComponent(userInfo._id)}`} /> : <LoginRegister /> }/>
+                  <Route path="/users/:userId" element={isLoggedIn ? <UserDetailRoute /> : <Navigate to="/login" />} />
+                  <Route path="/photos/:userId/:index" element={isLoggedIn ? <UserSinglePhotoRoute /> :  <Navigate to="/login" />} />
+                  <Route path="/photos/:userId" element={isLoggedIn ? <UserPhotosRoute /> :  <Navigate to="/login" />} />
+                  <Route path="/comments/:userId" element={isLoggedIn ? <UserCommentsRoute /> :  <Navigate to="/login" />} />
+                  <Route path="/users" element={isLoggedIn ? <UserList /> :  <Navigate to="/login" />} />
+                  <Route path="/*" element={isLoggedIn ? <Navigate to={`/users/${encodeURIComponent(userInfo._id)}`} /> :  <Navigate to="/login" /> }/>
+                  <Route path="/" element={isLoggedIn ? <Navigate to={`/users/${encodeURIComponent(userInfo._id)}`} /> :  <Navigate to="/login" /> }/>
                 </Routes>
               </Paper>
             </Grid>

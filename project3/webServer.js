@@ -21,13 +21,17 @@ import { dirname } from 'path';
 import User from "./schema/user.js";
 import Photo from "./schema/photo.js";
 import SchemaInfo from "./schema/schemaInfo.js";
+import session from "express-session";
 
 const portno = 3001; // Port number to use
 const app = express();
 
+app.use(express.json());
+
 // Enable CORS for all routes
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
   if (req.method === 'OPTIONS') {
@@ -36,6 +40,20 @@ app.use((req, res, next) => {
     next();
   }
 });
+
+app.use(session({
+  secret: 'none',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false }
+}));
+
+function requireLogin(req, res, next) {
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Not logged in" });
+  }
+  return next();
+}
 
 mongoose.Promise = bluebird;
 mongoose.set("strictQuery", false);
@@ -52,7 +70,7 @@ const __dirname = dirname(__filename);
 // (http://expressjs.com/en/starter/static-files.html) do all the work for us.
 app.use(express.static(__dirname));
 
-app.get("/", function (request, response) {
+app.get("/", requireLogin, function (request, response) {
   response.send("Simple web server of files from " + __dirname);
 });
 
@@ -60,7 +78,7 @@ app.get("/", function (request, response) {
  * /test/info - Returns the SchemaInfo object of the database in JSON format.
  *              This is good for testing connectivity with MongoDB.
  */
-app.get('/test/info', async (request, response) => {
+app.get('/test/info', requireLogin, async (request, response) => {
   try {
     // Get SchemaInfo
     const info = await SchemaInfo.find();
@@ -75,7 +93,7 @@ app.get('/test/info', async (request, response) => {
  * /test/counts - Returns an object with the counts of the different collections
  *                in JSON format.
  */
-app.get('/test/counts', async (request, response) => {
+app.get('/test/counts', requireLogin, async (request, response) => {
 
   try {
     // Get counts
@@ -98,7 +116,7 @@ app.get('/test/counts', async (request, response) => {
 /**
  * URL /user/list - Returns all the User objects.
  */
-app.get('/user/list', async (request, response) => {
+app.get('/user/list', requireLogin, async (request, response) => {
 
   try {
     // Find all users
@@ -112,7 +130,7 @@ app.get('/user/list', async (request, response) => {
 /**
  * URL /user/:id - Returns the information for User (id).
  */
-app.get('/user/:id', async (request, response) => {
+app.get('/user/:id', requireLogin, async (request, response) => {
 
   try {
     // Find user by ID
@@ -132,7 +150,7 @@ app.get('/user/:id', async (request, response) => {
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
-app.get('/photosOfUser/:id', async (request, response) => {
+app.get('/photosOfUser/:id', requireLogin, async (request, response) => {
 
   try {
     // Find photos by user ID
@@ -187,7 +205,7 @@ app.get('/photosOfUser/:id', async (request, response) => {
 /**
  * URL /usersPhotoCount - Returns the Photos Counts for all User objects.
  */
-app.get('/usersPhotoCount', async (request, response) => {
+app.get('/usersPhotoCounts', requireLogin, async (request, response) => {
 
   try {
 
@@ -221,7 +239,7 @@ app.get('/usersPhotoCount', async (request, response) => {
 /**
  * URL /usersCommentCount - Returns the Comments Counts for all User objects.
  */
-app.get('/usersCommentCount', async (request, response) => {
+app.get('/usersCommentCounts', requireLogin, async (request, response) => {
   try {
 
     // Get all user IDs
@@ -255,7 +273,7 @@ app.get('/usersCommentCount', async (request, response) => {
 /**
  * URL /usersCommentDetails - Returns the Comments Details for given user id.
  */
-app.get('/usersCommentDetails/:id', async (request, response) => {
+app.get('/usersCommentDetails/:id', requireLogin, async (request, response) => {
   try {
     const userId = request.params.id;
 
@@ -307,6 +325,67 @@ app.get('/usersCommentDetails/:id', async (request, response) => {
   }
 });
 
+app.post("/admin/login", async (request, response) => {
+  try {
+
+    const { login_name } = request.body;
+    console.log(login_name)
+    const user = await User.findOne({ login_name: login_name })
+    console.log(user)
+
+    if (!user) {
+      return response.status(400).json({ error: "User not found" });
+    }
+
+    request.session.user = {
+      _id: user._id,
+      first_name: user.first_name
+    }
+
+    console.log(request.session.user)
+
+    return response.json(request.session.user);
+    
+
+  } catch (err) {
+    return response.status(500).json({ error: 'login error' });
+  }
+});
+
+app.get("/admin/currentUser", async (request, response) => {
+  try {
+    if(!request.session || !request.session.user){
+      return response.status(401).json({ error: 'No session found' });
+    }
+    const user = await User.findById(request.session.user._id).select('_id first_name')
+    if (!user) {
+      return response.status(400).json({ error: 'No user found' });
+    }
+    return response.status(200).json(user);
+  } catch (err) {
+    return response.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post("/admin/logout", (req, res) => {
+  try {
+    if (!req.session.user) {
+      return res.status(400).json({ error: "No user Logged in" });
+    }
+
+    req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ error: "Logout failed" });
+    }
+
+    res.clearCookie("connect.sid");
+
+    return res.status(200).json({ message: "User logged out successfully" });
+  });
+  } catch (err) {
+    return response.status(500).json({ error: 'Server error' });
+  }
+});
 
 const server = app.listen(portno, function () {
   const port = server.address().port;
