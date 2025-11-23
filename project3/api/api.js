@@ -60,10 +60,11 @@ export const fetchCommentCounts = async () => {
   }
 }
 
-export const loginToAccount = async (loginName) => {
+export const loginToAccount = async (loginName, password) => {
   try {
     const res = await api.post('/admin/login', {
-      login_name: loginName
+      login_name: loginName,
+      password: password
     });
     return res.data;
   } catch (err) {
@@ -89,5 +90,24 @@ export const logoutOfAccount = async () => {
   } catch (err) {
     console.error('Error:', err);
     throw err;
+  }
+}
+
+export const registerAccount = async (loginName, password, firstName, lastName, location, description, occupation) => {
+  try {
+    console.log("here");
+    const res = await api.post('/user', {
+      login_name: loginName, 
+      password: password, 
+      first_name: firstName, 
+      last_name: lastName, 
+      location: location, 
+      description: description, 
+      occupation: occupation
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
   }
 }

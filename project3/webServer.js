@@ -328,13 +328,22 @@ app.get('/usersCommentDetails/:id', requireLogin, async (request, response) => {
 app.post("/admin/login", async (request, response) => {
   try {
 
-    const { login_name } = request.body;
-    console.log(login_name)
-    const user = await User.findOne({ login_name: login_name })
-    console.log(user)
+    const { login_name, password } = request.body;
+    
+   
+
+    if ((!login_name || login_name.trim().length === 0) && (!password || password.trim().length === 0)) {
+      return response.status(400).send("Please enter username and password")
+    } else if (!login_name || login_name.trim().length === 0){
+      return response.status(400).send("Please enter username")
+    } else if (!password || password.trim().length === 0) {
+      return response.status(400).send("Please enter password")
+    } 
+
+    const user = await User.findOne({ login_name: login_name, password: password })
 
     if (!user) {
-      return response.status(400).json({ error: "User not found" });
+      return response.status(400).send("Incorrect username or password");
     }
 
     request.session.user = {
@@ -342,11 +351,8 @@ app.post("/admin/login", async (request, response) => {
       first_name: user.first_name
     }
 
-    console.log(request.session.user)
-
     return response.json(request.session.user);
     
-
   } catch (err) {
     return response.status(500).json({ error: 'login error' });
   }
@@ -367,23 +373,62 @@ app.get("/admin/currentUser", async (request, response) => {
   }
 });
 
-app.post("/admin/logout", (req, res) => {
+app.post("/admin/logout", async (request, response) => {
   try {
-    if (!req.session.user) {
-      return res.status(400).json({ error: "No user Logged in" });
+    if (!request.session.user) {
+      return response.status(400).json({ error: "No user Logged in" });
     }
 
-    req.session.destroy(err => {
+    request.session.destroy(err => {
     if (err) {
-      return res.status(500).json({ error: "Logout failed" });
+      return response.status(500).json({ error: "Logout failed" });
     }
 
-    res.clearCookie("connect.sid");
+    response.clearCookie("connect.sid");
 
-    return res.status(200).json({ message: "User logged out successfully" });
+    return response.status(200).json({ message: "User logged out successfully" });
   });
   } catch (err) {
     return response.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post("/user", async (req, res) => {
+  try {
+    const { login_name, password, first_name, last_name, location, description, occupation } = req.body;
+    const missingFields = [];
+    
+    if (!login_name || login_name.trim().length === 0) missingFields.push("Login Name");
+    if (!password || password.trim().length === 0) missingFields.push("Password");
+    if (!first_name || first_name.trim().length === 0) missingFields.push("First Name");
+    if (!last_name || last_name.trim().length === 0) missingFields.push("Last Name");
+
+    if (missingFields.length > 0) {
+      return res.status(400).send(`Please fill in: ${missingFields.join(", ")}`)
+    }
+
+    const user = await User.findOne({ login_name });
+    if (user) {
+      return res.status(400).send('Login Name already exists');
+    }
+
+    const newUser = await User.create({
+      login_name: login_name.trim(),
+      password: password.trim(),
+      first_name: first_name.trim(),
+      last_name: last_name.trim(),
+      location: location ? location.trim() : '',
+      description: description ? description.trim() : '',
+      occupation: occupation ? occupation.trim() : '',
+    });
+
+    return res.status(200).send({
+      _id: newUser._id,
+      login_name: newUser.login_name,
+    });
+
+  } catch (err) {
+    return res.status(500).send({ error: 'Server error' });
   }
 });
 

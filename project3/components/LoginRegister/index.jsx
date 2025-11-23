@@ -14,40 +14,105 @@ import { useMutation } from "@tanstack/react-query";
 
 
 import './styles.css';
-import { loginToAccount } from '../../api/api.js';
+import { loginToAccount, registerAccount } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function LoginRegister() {
 
-  // Set Navigation
+  // Set Navigation and variables
   const navigate = useNavigate();
   const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
   const setUserInfo = useAppStore((s) => s.setUserInfo);
   const [loginFailed, setLoginFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [onLoginPage, setOnLoginPage] = useState(true);
+  const [registerSuccess, setRegisterSuccess] = useState(false);
+
+  const [loginName, setLoginName] = useState("");
+  const [password, setPassword] = useState("");
+  const [secondPassword, setSecondPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [location, setLocation] = useState("");
+  const [occupation, setOccupation] = useState("");
+  const [description, setDescription] = useState("");
 
   const login = useMutation({
-    mutationFn: (loginName) => loginToAccount(loginName),
+    mutationFn: ({loginName, password}) => loginToAccount(loginName, password),
     onSuccess: (data) => {
-      setLoginFailed(false)
+      setLoginFailed(false);
       setUserInfo(data);
       setIsLoggedIn(true);
       navigate(`/users/${encodeURIComponent(data._id)}`);
     },
     onError: (err) => {
-      console.error("Login failed:", err);
-      setLoginFailed(true)
+      setErrorMessage(err.response.data);
+      setLoginFailed(true);
+    }
+  });
+
+
+   const register = useMutation({
+    mutationFn: ({loginName, password, firstName, lastName, 
+      location, description, occupation}) => registerAccount(loginName, password, firstName, lastName, 
+      location, description, occupation),
+    onSuccess: (data) => {
+      setLoginFailed(false);
+      setRegisterSuccess(true);
+    },
+    onError: (err) => {
+      setErrorMessage(err.response.data);
+      setLoginFailed(true);
     }
   });
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    login.mutate(data.get('loginName'))
+    const loginName = data.get("loginName");
+    const password = data.get("password");
+    login.mutate({loginName, password})
   };
 
+  const switchPages = (event) => {
+    setOnLoginPage(!onLoginPage)
+    setLoginFailed(false);
+    setErrorMessage("");
+
+    setLoginName("");
+    setPassword("");
+    setSecondPassword("");
+    setFirstName("");
+    setLastName("");
+    setLocation("");
+    setOccupation("");
+    setDescription("");
+  }
+
+  const handleRegister = (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const loginName = data.get("loginName");
+    const password = data.get("password");
+    const secondPassword = data.get("secondPassword");
+    const firstName = data.get("firstName");
+    const lastName = data.get("lastName");
+    const location = data.get("location");
+    const occupation = data.get("occupation");
+    const description = data.get("description");
+
+    // Check if passwords match
+    if (password !== secondPassword) {
+      setErrorMessage("Passwords do not match");
+      setLoginFailed(true);
+      return;
+    }
+    register.mutate({loginName, password, firstName, lastName, location, description, occupation})
+  }
 
   return (
-      <Container align="center" maxWidth="xs" >
+     onLoginPage ? 
+       (<Container align="center" maxWidth="xs" >
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
@@ -59,10 +124,11 @@ function LoginRegister() {
               id="loginName"
               label="Login Name"
               name="loginName"
-              // autoComplete="email"
+              value={loginName}
+              onChange={(e) => setLoginName(e.target.value)}
               autoFocus
             />
-            {/* <TextField
+            <TextField
               margin="normal"
               required
               fullWidth
@@ -71,7 +137,9 @@ function LoginRegister() {
               type="password"
               id="password"
               autoComplete="current-password"
-            /> */}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
             <Button
               type="submit"
               fullWidth
@@ -80,15 +148,120 @@ function LoginRegister() {
             >
               Sign In
             </Button>
-            {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">Please enter a valid user</Alert> : <></> }
-            <Grid item>
-              <Link href="#" variant="body2">
+            {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : <></> }
+          </Box>
+          <Grid item>
+              <Link component="button" variant="body2" onClick={switchPages}>
                 {"Don't have an account? Sign Up"}
+              </Link>
+          </Grid>
+      </Container>)  : 
+      (<Container align="center" maxWidth="xs" >
+        <Typography component="h1" variant="h5">
+          Register
+        </Typography>
+        <Box component="form" onSubmit={handleRegister} noValidate sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="loginName"
+              label="Login Name"
+              name="loginName"
+              value={loginName}
+              onChange={(e) => setLoginName(e.target.value)}
+              autoFocus
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="secondPassword"
+              label="Confirm Password"
+              type="password"
+              id="secondPassword"
+              autoComplete="current-password"
+              value={secondPassword}
+              onChange={(e) => setSecondPassword(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="firstName"
+              label="First Name"
+              name="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="lastName"
+              label="Last Name"
+              name="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="location"
+              label="Location"
+              name="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="occupation"
+              label="Occupation"
+              name="occupation"
+              value={occupation}
+              onChange={(e) => setOccupation(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              fullWidth
+              id="description"
+              label="Description"
+              name="description"
+              multiline
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Register Me
+            </Button>
+            {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : <></> }
+            {registerSuccess ? <Alert sx={{ mt: 1, mb: 1  }} severity="success"> Registered account successfuly </Alert> : <></>}
+            <Grid item>
+              <Link component="button" variant="body2" onClick={switchPages}>
+                {"Already have an account? Login"}
               </Link>
             </Grid>
           </Box>
-      </Container>
-  );
+      </Container>));
 }
 
 export default LoginRegister;
