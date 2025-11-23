@@ -27,6 +27,7 @@ function TopBar() {
   const isLoggedIn = useAppStore((s) => s.isLoggedIn);
   const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
   const setUserInfo = useAppStore((s) => s.setUserInfo);
+  const userAccountInfo = useAppStore((s) => s.userInfo);
 
   // Get user ID
   const location = useLocation();
@@ -58,7 +59,7 @@ function TopBar() {
         <>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="h5" color="inherit" >
-              Hi {userDetails.first_name}
+              Hi {userAccountInfo.first_name}
             </Typography>
             <FormGroup>
               <FormControlLabel 
