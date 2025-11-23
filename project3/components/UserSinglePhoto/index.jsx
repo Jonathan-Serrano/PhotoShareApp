@@ -42,6 +42,7 @@ function UserSinglePhoto({ userId, index}) {
     mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["photos", userId] });
+      queryClient.invalidateQueries({ queryKey: ["commentCounts"] });
     }
   })
 
