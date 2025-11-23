@@ -9,14 +9,20 @@ import {
   CardContent,
   Typography,
   Pagination,
+  TextField,
+  Button,
+  Divider,
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import './styles.css';
-import { fetchPhotos } from '../../api/api.js';
+import { fetchPhotos, addComment } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function UserSinglePhoto({ userId, index}) {
+
+  const queryClient = useQueryClient();
+  const [commentText, setCommentText] = useState('');
 
   // Access isChecked and setIsChecked from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
@@ -31,6 +37,19 @@ function UserSinglePhoto({ userId, index}) {
     queryKey: ["photos", userId],
     queryFn: () => fetchPhotos(userId),
   });
+
+  const useAddComment = useMutation({
+    mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["photos", userId] });
+    }
+  })
+
+  const handleAddComment = (photoId, text) => {
+    useAddComment.mutate({ photoId, comment: text }, {
+      onSuccess: () => setCommentText(''),
+    });
+  }
 
   const photo = photos?.[index - 1] || {};
   const photoLength = photos?.length || 0;
@@ -72,6 +91,34 @@ function UserSinglePhoto({ userId, index}) {
               <Typography variant="subtitle1" color="text.primary">
                 Comments:
               </Typography>
+              
+              <Box sx={{ mb: 3 }}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={3}
+                  placeholder="Type your comment here..."
+                  value={commentText}
+                  onChange={(e) => {
+                    setCommentText(e.target.value);
+                  }}
+                  disabled={useAddComment.isPending}
+                  sx={{ mb: 1 }}
+                />
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleAddComment(photo._id, commentText)}
+                    disabled={useAddComment.isPending}
+                    sx={{ textTransform: 'none' }}
+                  >
+                    {useAddComment.isPending ? 'Adding...' : 'Add Comment'}
+                  </Button>
+                </Box>
+                <Divider sx={{ mt: 2 }} />
+              </Box>
+
               {photo.comments && photo.comments.length > 0 ? (
               photo.comments.map((comment) => (
                 <Box key={comment._id} sx={{ marginBottom: 1 }}>

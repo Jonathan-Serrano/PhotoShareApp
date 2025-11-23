@@ -387,6 +387,38 @@ app.post("/admin/logout", (req, res) => {
   }
 });
 
+/**
+ * POST /commentsOfPhoto/:photo_id - Add a comment to a photo.
+ */
+app.post('/commentsOfPhoto/:photo_id', requireLogin, async (request, response) => {
+  const { photo_id } = request.params;
+  const { comment } = request.body;
+
+  if (!comment || comment.trim() === '') {
+    return response.status(400).json({ error: 'Comment cannot be empty' });
+  }
+
+  try {
+    const photo = await Photo.findById(photo_id).exec();
+    if (!photo) {
+      return response.status(400).json({ error: 'Photo not found' });
+    }
+
+    const newComment = {
+      comment,
+      date_time: new Date(),
+      user_id: request.session.user._id,
+    };
+
+    photo.comments.push(newComment);
+    await photo.save();
+
+    return response.status(200).json(newComment);
+  } catch (err) {
+    return response.status(500).json({ error: 'Server error' });
+  }
+});
+
 const server = app.listen(portno, function () {
   const port = server.address().port;
   console.log(

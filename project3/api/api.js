@@ -91,3 +91,14 @@ export const logoutOfAccount = async () => {
     throw err;
   }
 }
+
+// Comments
+export const addComment = async (photoId, comment) => {
+  try {
+    const res = await api.post(`/commentsOfPhoto/${photoId}`, { comment });
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
