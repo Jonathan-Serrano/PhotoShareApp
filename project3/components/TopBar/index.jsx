@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   FormGroup,
   FormControlLabel,
@@ -7,21 +7,26 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Box
+  Box,
+  IconButton
 } from '@mui/material';
 import { useQuery } from "@tanstack/react-query";
 import LogoutIcon from '@mui/icons-material/Logout';
 
 import './styles.css';
-import { fetchUser } from '../../api/api.js';
+import { fetchUser, logoutOfAccount } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
+import { useMutation } from "@tanstack/react-query";
 
 function TopBar() {
 
   // Access isChecked and toggleChecked from Zustand
+  const navigate = useNavigate();
   const isChecked = useAppStore((s) => s.isChecked);
   const toggleChecked = useAppStore((s) => s.toggleChecked);
   const isLoggedIn = useAppStore((s) => s.isLoggedIn);
+  const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
+  const setUserInfo = useAppStore((s) => s.setUserInfo);
 
   // Get user ID
   const location = useLocation();
@@ -36,6 +41,15 @@ function TopBar() {
     queryFn: () => fetchUser(userId),
     enabled: isLoggedIn && !!userId
   });
+
+  const logout = useMutation({
+  mutationFn: logoutOfAccount,
+  onSuccess: () => {
+    setUserInfo(null);
+    setIsLoggedIn(false);
+    navigate('/login');
+  }
+});
 
   return (
     <AppBar className="topbar-appBar" position="absolute">
@@ -60,7 +74,9 @@ function TopBar() {
               {!(parsedPath.includes("photos") || parsedPath.includes("comments")) && userId ? `${userDetails.first_name} ${userDetails.last_name}` : ''}
               {parsedPath.includes("comments") && userId ? `Comments of ${userDetails.first_name} ${userDetails.last_name}` : ''}
             </Typography>
-            <LogoutIcon />
+            <IconButton onClick={() => logout.mutate()}>
+              <LogoutIcon />
+            </IconButton>
           </Box> 
         </>
         ) : (

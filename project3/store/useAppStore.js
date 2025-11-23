@@ -7,6 +7,7 @@ const useAppStore = create((set) => ({
 
   isLoggedIn: false,
   setIsLoggedIn: (value) => set({ isLoggedIn: value }),
+
   userInfo: {},
   setUserInfo: (value) => set({ userInfo: value }),
 }));

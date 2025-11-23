@@ -25,13 +25,10 @@ function LoginRegister() {
   const setUserInfo = useAppStore((s) => s.setUserInfo);
   const [loginFailed, setLoginFailed] = useState(false);
 
-  // const [userId, setUserId] = useState('');
-
   const login = useMutation({
     mutationFn: (loginName) => loginToAccount(loginName),
     onSuccess: (data) => {
       setLoginFailed(false)
-      console.log("Logged in!", data);
       setUserInfo(data);
       setIsLoggedIn(true);
       navigate(`/users/${encodeURIComponent(data._id)}`);

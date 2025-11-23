@@ -81,3 +81,13 @@ export const getCurrentUser = async () => {
     throw err;
   }
 }
+
+export const logoutOfAccount = async () => {
+  try {
+    const res = await api.post('/admin/logout');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+}
