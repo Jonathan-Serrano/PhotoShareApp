@@ -355,15 +355,15 @@ app.post("/admin/login", async (request, response) => {
 app.get("/admin/currentUser", async (request, response) => {
   try {
     if(!request.session || !request.session.user){
-      return response.status(401).send({ error: 'No session found' });
+      return response.status(401).json({ error: 'No session found' });
     }
     const user = await User.findById(request.session.user._id).select('_id first_name')
     if (!user) {
-      return response.status(400).send({ error: 'No user found' });
+      return response.status(400).json({ error: 'No user found' });
     }
-    return response.status(200).send(user);
+    return response.status(200).json(user);
   } catch (err) {
-    return response.status(500).send({ error: 'Server error' });
+    return response.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -383,7 +383,7 @@ app.post("/admin/logout", (req, res) => {
     return res.status(200).json({ message: "User logged out successfully" });
   });
   } catch (err) {
-    return response.status(500).send({ error: 'Server error' });
+    return response.status(500).json({ error: 'Server error' });
   }
 });
 
