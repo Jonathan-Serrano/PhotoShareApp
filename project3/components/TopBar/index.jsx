@@ -8,7 +8,7 @@ import {
   Toolbar,
   Typography,
   Box,
-  IconButton
+  Button
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -93,19 +93,29 @@ function TopBar() {
                 }
               }}
             />
-            <label htmlFor="upload-photo">
-              <IconButton component="span">
-                <AddPhotoAlternateOutlinedIcon />
-              </IconButton>
+            <label htmlFor="upload-photo" style={{ display: 'inline-block', cursor: 'pointer' }}>
+              <Button
+                component="span"
+                variant="outlined"
+                color="inherit"
+                startIcon={<AddPhotoAlternateOutlinedIcon />}
+              >
+                Add Photo
+              </Button>
             </label>
             <Typography variant="h5" color="inherit">
               {parsedPath.includes("photos") && userId ? `Photos of ${userDetails.first_name} ${userDetails.last_name}` : ''}
               {!(parsedPath.includes("photos") || parsedPath.includes("comments")) && userId ? `${userDetails.first_name} ${userDetails.last_name}` : ''}
               {parsedPath.includes("comments") && userId ? `Comments of ${userDetails.first_name} ${userDetails.last_name}` : ''}
             </Typography>
-            <IconButton onClick={() => logout.mutate()}>
-              <LogoutIcon />
-            </IconButton>
+            <Button
+              variant="outlined"
+              color="inherit"
+              startIcon={<LogoutIcon />}
+              onClick={() => logout.mutate()}
+            >
+              Logout
+            </Button>
           </Box> 
         </>
         ) : (
