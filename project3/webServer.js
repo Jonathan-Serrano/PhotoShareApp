@@ -20,10 +20,10 @@ import { dirname, join } from 'path';
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 // ToDO - Your submission will use code below, so make sure to uncomment this line for tests and before submission!
+import session from "express-session";
 import User from "./schema/user.js";
 import Photo from "./schema/photo.js";
 import SchemaInfo from "./schema/schemaInfo.js";
-import session from "express-session";
 
 const portno = 3001; // Port number to use
 const app = express();
@@ -337,14 +337,14 @@ app.post("/admin/login", async (request, response) => {
    
 
     if ((!login_name || login_name.trim().length === 0) && (!password || password.trim().length === 0)) {
-      return response.status(400).send("Please enter username and password")
+      return response.status(400).send("Please enter username and password");
     } else if (!login_name || login_name.trim().length === 0){
-      return response.status(400).send("Please enter username")
+      return response.status(400).send("Please enter username");
     } else if (!password || password.trim().length === 0) {
-      return response.status(400).send("Please enter password")
+      return response.status(400).send("Please enter password");
     } 
 
-    const user = await User.findOne({ login_name: login_name, password: password })
+    const user = await User.findOne({ login_name: login_name, password: password });
 
     if (!user) {
       return response.status(400).send("Incorrect username or password");
@@ -353,7 +353,7 @@ app.post("/admin/login", async (request, response) => {
     request.session.user = {
       _id: user._id,
       first_name: user.first_name
-    }
+    };
 
     return response.json(request.session.user);
     
@@ -367,7 +367,7 @@ app.get("/admin/currentUser", async (request, response) => {
     if(!request.session || !request.session.user){
       return response.status(401).json({ error: 'No session found' });
     }
-    const user = await User.findById(request.session.user._id).select('_id first_name')
+    const user = await User.findById(request.session.user._id).select('_id first_name');
     if (!user) {
       return response.status(400).json({ error: 'No user found' });
     }
@@ -383,7 +383,7 @@ app.post("/admin/logout", async (request, response) => {
       return response.status(400).json({ error: "No user Logged in" });
     }
 
-    request.session.destroy(err => {
+    return request.session.destroy(err => {
     if (err) {
       return response.status(500).json({ error: "Logout failed" });
     }
@@ -411,7 +411,7 @@ app.post("/user", async (req, res) => {
     if (!last_name || last_name.trim().length === 0) missingFields.push("Last Name");
 
     if (missingFields.length > 0) {
-      return res.status(400).send(`Please fill in: ${missingFields.join(", ")}`)
+      return res.status(400).send(`Please fill in: ${missingFields.join(", ")}`);
     }
 
     const user = await User.findOne({ login_name });

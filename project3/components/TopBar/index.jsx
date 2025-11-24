@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   FormGroup,
@@ -10,19 +10,17 @@ import {
   Box,
   IconButton
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 
 import './styles.css';
 import { fetchUser, logoutOfAccount, uploadPhoto } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function TopBar() {
 
   const queryClient = useQueryClient();
-  const [file, setFile] = useState(null);
 
   // Access isChecked and toggleChecked from Zustand
   const navigate = useNavigate();
@@ -41,7 +39,7 @@ function TopBar() {
                 : (parsedPath.length >= 4) ? parsedPath[parsedPath.length - 2] : null;
 
   // Fetch user details
-  const { data: userDetails = {}, isLoading, error } = useQuery({
+  const { data: userDetails = {} } = useQuery({
     queryKey: ["userDetails", userId],
     queryFn: () => fetchUser(userId),
     enabled: isLoggedIn && !!userId
@@ -91,7 +89,6 @@ function TopBar() {
               onChange={(e) => {
                 const selected = e.target.files[0];
                 if (selected) {
-                  setFile(selected);
                   useUploadPhoto.mutate(selected);
                 }
               }}
@@ -117,8 +114,7 @@ function TopBar() {
               Please Login
             </Typography>
           </Box>
-        )
-      } 
+        )} 
       </Toolbar>
     </AppBar>
   );

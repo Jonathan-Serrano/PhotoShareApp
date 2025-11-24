@@ -25,7 +25,7 @@ function UserDetail({ userId }) {
   const navigate = useNavigate();
 
   // Fetch user details
-  const { data: userDetails = {}, isLoading, error } = useQuery({
+  const { data: userDetails = {} } = useQuery({
     queryKey: ["userDetails", userId],
     queryFn: () => fetchUser(userId),
     enabled: !!userId,

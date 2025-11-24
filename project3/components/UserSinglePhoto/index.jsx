@@ -33,7 +33,7 @@ function UserSinglePhoto({ userId, index}) {
   const firstRun = useRef(true);
 
   // Fetch user photos
-  const { data: photos = [], isLoading, error } = useQuery({
+  const { data: photos = [] } = useQuery({
     queryKey: ["photos", userId],
     queryFn: () => fetchPhotos(userId),
   });
@@ -44,13 +44,13 @@ function UserSinglePhoto({ userId, index}) {
       queryClient.invalidateQueries({ queryKey: ["photos", userId] });
       queryClient.invalidateQueries({ queryKey: ["commentCounts"] });
     }
-  })
+  });
 
   const handleAddComment = (photoId, text) => {
     useAddComment.mutate({ photoId, comment: text }, {
       onSuccess: () => setCommentText(''),
     });
-  }
+  };
 
   const photo = photos?.[index - 1] || {};
   const photoLength = photos?.length || 0;

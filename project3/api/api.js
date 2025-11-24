@@ -3,7 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: "http://localhost:3001",
   withCredentials: true  
-})
+});
 
 // ------------ GET REQUESTS ------------
 export const fetchUsers = async () => {
@@ -12,6 +12,7 @@ export const fetchUsers = async () => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+    throw err;
   }
 };
 
@@ -21,6 +22,7 @@ export const fetchUser = async (userId) => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+    throw err;
   }
 };
 
@@ -30,6 +32,7 @@ export const fetchPhotos = async (userId) => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+    throw err;
   }
 };
 
@@ -39,6 +42,7 @@ export const fetchComments = async (userId) => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+    throw err;
   }
 };
 
@@ -48,8 +52,9 @@ export const fetchPhotoCounts = async () => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+    throw err;
   }
-}
+};
 
 export const fetchCommentCounts = async () => {
   try {
@@ -57,8 +62,9 @@ export const fetchCommentCounts = async () => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+    throw err;
   }
-}
+};
 
 export const loginToAccount = async (loginName, password) => {
   try {
@@ -71,7 +77,7 @@ export const loginToAccount = async (loginName, password) => {
     console.error('Error:', err);
     throw err;
   }
-}
+};
 
 export const getCurrentUser = async () => {
   try {
@@ -81,7 +87,7 @@ export const getCurrentUser = async () => {
     console.error('Error:', err);
     throw err;
   }
-}
+};
 
 export const logoutOfAccount = async () => {
   try {
@@ -91,7 +97,7 @@ export const logoutOfAccount = async () => {
     console.error('Error:', err);
     throw err;
   }
-}
+};
 
 export const registerAccount = async (loginName, password, firstName, lastName, location, description, occupation) => {
   try {
@@ -136,8 +142,8 @@ export const uploadPhoto = async (file) => {
       },
     });
     return res.data;
-  } catch (error) {
+  } catch (err) {
     console.error('Error:', err);
-    throw error;
+    throw err;
   }
 };

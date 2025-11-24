@@ -17,7 +17,7 @@ import UserPhotos from './components/UserPhotos';
 import UserSinglePhoto from './components/UserSinglePhoto';
 import UserComments from './components/UserComments';
 import useAppStore from './store/useAppStore.js';
-import LoginRegister from './components/LoginRegister'
+import LoginRegister from './components/LoginRegister';
 
 const queryClient = new QueryClient();
 
@@ -67,7 +67,7 @@ function PhotoShare() {
   }, [setUserInfo, setIsLoggedIn]); 
 
   if (isLoading) {
-    return (<div>Loading...</div>)
+    return (<div>Loading...</div>);
   }
 
   return (
@@ -79,12 +79,14 @@ function PhotoShare() {
               <TopBar />
             </Grid>
             <div className="main-topbar-buffer"/>
-            {isLoggedIn ? ( <Grid item sm={3}>
-              <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
-                {<UserList />}
-              </Paper>
-            </Grid>) : (
-              <></>
+            {isLoggedIn ? ( 
+              <Grid item sm={3}>
+                <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
+                  {<UserList />}
+                </Paper>
+              </Grid>
+            ) : (
+              null
             )}
             <Grid item sm={isLoggedIn ? 9 : 12}>
               <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>

@@ -7,8 +7,7 @@ import {
   TextField,
   Button,
   Grid,
-  Link,
-  Alert
+  Alert,
 } from '@mui/material';
 import { useMutation } from "@tanstack/react-query";
 
@@ -38,7 +37,7 @@ function LoginRegister() {
   const [description, setDescription] = useState("");
 
   const login = useMutation({
-    mutationFn: ({loginName, password}) => loginToAccount(loginName, password),
+    mutationFn: () => loginToAccount(loginName, password),
     onSuccess: (data) => {
       setLoginFailed(false);
       setUserInfo(data);
@@ -53,12 +52,19 @@ function LoginRegister() {
 
 
    const register = useMutation({
-    mutationFn: ({loginName, password, firstName, lastName, 
-      location, description, occupation}) => registerAccount(loginName, password, firstName, lastName, 
+    mutationFn: () => registerAccount(loginName, password, firstName, lastName, 
       location, description, occupation),
-    onSuccess: (data) => {
+    onSuccess: () => {
       setLoginFailed(false);
       setRegisterSuccess(true);
+      setLoginName("");
+      setPassword("");
+      setSecondPassword("");
+      setFirstName("");
+      setLastName("");
+      setLocation("");
+      setOccupation("");
+      setDescription("");
     },
     onError: (err) => {
       setErrorMessage(err.response.data);
@@ -68,14 +74,11 @@ function LoginRegister() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const loginName = data.get("loginName");
-    const password = data.get("password");
-    login.mutate({loginName, password})
+    login.mutate({loginName, password});
   };
 
-  const switchPages = (event) => {
-    setOnLoginPage(!onLoginPage)
+  const switchPages = () => {
+    setOnLoginPage(!onLoginPage);
     setLoginFailed(false);
     setErrorMessage("");
 
@@ -87,19 +90,10 @@ function LoginRegister() {
     setLocation("");
     setOccupation("");
     setDescription("");
-  }
+  };
 
   const handleRegister = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const loginName = data.get("loginName");
-    const password = data.get("password");
-    const secondPassword = data.get("secondPassword");
-    const firstName = data.get("firstName");
-    const lastName = data.get("lastName");
-    const location = data.get("location");
-    const occupation = data.get("occupation");
-    const description = data.get("description");
 
     // Check if passwords match
     if (password !== secondPassword) {
@@ -107,12 +101,13 @@ function LoginRegister() {
       setLoginFailed(true);
       return;
     }
-    register.mutate({loginName, password, firstName, lastName, location, description, occupation})
-  }
+    register.mutate({loginName, password, firstName, lastName, location, description, occupation});
+  };
 
   return (
      onLoginPage ? 
-       (<Container align="center" maxWidth="xs" >
+       (
+       <Container align="center" maxWidth="xs" >
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
@@ -148,15 +143,17 @@ function LoginRegister() {
             >
               Sign In
             </Button>
-            {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : <></> }
-          </Box>
+            {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : null }
+        </Box>
           <Grid item>
-              <Link component="button" variant="body2" onClick={switchPages}>
-                {"Don't have an account? Sign Up"}
-              </Link>
+            <Button variant="secondary" size="small" sx={{ textTransform: "none" }} onClick={switchPages}>
+              {"Don't have an account? Sign Up"}
+            </Button>
           </Grid>
-      </Container>)  : 
-      (<Container align="center" maxWidth="xs" >
+       </Container>
+      )  : 
+      (
+      <Container align="center" maxWidth="xs" >
         <Typography component="h1" variant="h5">
           Register
         </Typography>
@@ -253,15 +250,16 @@ function LoginRegister() {
             >
               Register Me
             </Button>
-            {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : <></> }
-            {registerSuccess ? <Alert sx={{ mt: 1, mb: 1  }} severity="success"> Registered account successfuly </Alert> : <></>}
+            {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : null }
+            {registerSuccess ? <Alert sx={{ mt: 1, mb: 1  }} severity="success"> Registered account successfuly </Alert> :null}
             <Grid item>
-              <Link component="button" variant="body2" onClick={switchPages}>
+              <Button variant="secondary" size="small" sx={{ textTransform: "none" }} onClick={switchPages}>
                 {"Already have an account? Login"}
-              </Link>
+              </Button>
             </Grid>
-          </Box>
-      </Container>));
+        </Box>
+      </Container>
+      ));
 }
 
 export default LoginRegister;

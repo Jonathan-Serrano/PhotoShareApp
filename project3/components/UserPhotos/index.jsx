@@ -30,7 +30,7 @@ function UserPhotos({ userId }) {
   const navigate = useNavigate();
 
   // Fetch user photos
-  const { data: photos = [], isLoading, error } = useQuery({
+  const { data: photos = [] } = useQuery({
     queryKey: ["photos", userId],
     queryFn: () => fetchPhotos(userId),
   });
@@ -41,7 +41,7 @@ function UserPhotos({ userId }) {
       queryClient.invalidateQueries({ queryKey: ["photos", userId] });
       queryClient.invalidateQueries({ queryKey: ["commentCounts"] });
     }
-  })
+  });
 
   const handleAddComment = (photoId, text) => {
     useAddComment.mutate({ photoId, comment: text }, {
@@ -49,7 +49,7 @@ function UserPhotos({ userId }) {
         setCommentTextById(prev => ({ ...prev, [photoId]: '' }));
       }
     });
-  }
+  };
 
   useEffect(() => {
     // Navigate to first photo if advanced features is on
@@ -87,7 +87,7 @@ function UserPhotos({ userId }) {
                   setCommentTextById(prev => ({
                     ...prev,
                     [photo._id]: e.target.value,
-                  }))
+                  }));
                 }}
                 disabled={useAddComment.isPending}
                 sx={{ mb: 1 }}
@@ -97,7 +97,7 @@ function UserPhotos({ userId }) {
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    handleAddComment(photo._id, commentTextById[photo._id] || '')
+                    handleAddComment(photo._id, commentTextById[photo._id] || '');
                   }}
                   disabled={useAddComment.isPending}
                   sx={{ textTransform: 'none' }}

@@ -27,7 +27,7 @@ function UserComments({ userId }) {
     const navigate = useNavigate();
 
     // Fetch user comment details
-    const { data: commentDetails = [], isLoading, error } = useQuery({
+    const { data: commentDetails = [] } = useQuery({
         queryKey: ["commentDetails", userId],
         queryFn: () => fetchComments(userId),
     });
