@@ -1,4 +1,4 @@
-import React, { useEffect }  from 'react';
+import React, { useState, useEffect }  from 'react';
 import { Link, useNavigate } from "react-router-dom";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
@@ -8,14 +8,20 @@ import {
   CardMedia,
   CardContent,
   Typography,
+  TextField,
+  Button,
+  Divider,
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import './styles.css';
-import { fetchPhotos } from '../../api/api.js';
+import { fetchPhotos, addComment } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function UserPhotos({ userId }) {
+
+  const queryClient = useQueryClient();
+  const [commentTextById, setCommentTextById] = useState({});
 
   // Access isChecked from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
@@ -28,6 +34,22 @@ function UserPhotos({ userId }) {
     queryKey: ["photos", userId],
     queryFn: () => fetchPhotos(userId),
   });
+
+  const useAddComment = useMutation({
+    mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["photos", userId] });
+      queryClient.invalidateQueries({ queryKey: ["commentCounts"] });
+    }
+  })
+
+  const handleAddComment = (photoId, text) => {
+    useAddComment.mutate({ photoId, comment: text }, {
+      onSuccess: () => {
+        setCommentTextById(prev => ({ ...prev, [photoId]: '' }));
+      }
+    });
+  }
 
   useEffect(() => {
     // Navigate to first photo if advanced features is on
@@ -53,6 +75,39 @@ function UserPhotos({ userId }) {
             <Typography variant="subtitle1" color="text.primary">
               Comments:
             </Typography>
+
+            <Box sx={{ mb: 3 }}>
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                placeholder="Type your comment here..."
+                value={commentTextById[photo._id] || ''}
+                onChange={(e) => {
+                  setCommentTextById(prev => ({
+                    ...prev,
+                    [photo._id]: e.target.value,
+                  }))
+                }}
+                disabled={useAddComment.isPending}
+                sx={{ mb: 1 }}
+              />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    handleAddComment(photo._id, commentTextById[photo._id] || '')
+                  }}
+                  disabled={useAddComment.isPending}
+                  sx={{ textTransform: 'none' }}
+                >
+                  {useAddComment.isPending ? 'Adding...' : 'Add Comment'}
+                </Button>
+              </Box>
+              <Divider sx={{ mt: 2 }} />
+            </Box>
+
             {photo.comments && photo.comments.length > 0 ? (
               photo.comments.map((comment) => (
                 <Box key={comment._id} sx={{ marginBottom: 1 }}>
