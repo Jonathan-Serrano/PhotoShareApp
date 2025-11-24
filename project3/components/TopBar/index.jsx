@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   FormGroup,
@@ -12,13 +12,17 @@ import {
 } from '@mui/material';
 import { useQuery } from "@tanstack/react-query";
 import LogoutIcon from '@mui/icons-material/Logout';
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 
 import './styles.css';
-import { fetchUser, logoutOfAccount } from '../../api/api.js';
+import { fetchUser, logoutOfAccount, uploadPhoto } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function TopBar() {
+
+  const queryClient = useQueryClient();
+  const [file, setFile] = useState(null);
 
   // Access isChecked and toggleChecked from Zustand
   const navigate = useNavigate();
@@ -44,13 +48,22 @@ function TopBar() {
   });
 
   const logout = useMutation({
-  mutationFn: logoutOfAccount,
-  onSuccess: () => {
-    setUserInfo(null);
-    setIsLoggedIn(false);
-    navigate('/login');
-  }
-});
+    mutationFn: logoutOfAccount,
+    onSuccess: () => {
+      setUserInfo(null);
+      setIsLoggedIn(false);
+      navigate('/login');
+    }
+  });
+
+  const useUploadPhoto = useMutation({
+    mutationFn: uploadPhoto,
+    onSuccess: () => {
+      // Refresh the user's photos page
+      queryClient.invalidateQueries({ queryKey: ["photos", userId] });
+      queryClient.invalidateQueries({ queryKey: ["photoCounts"] });
+    }
+  });
 
   return (
     <AppBar className="topbar-appBar" position="absolute">
@@ -70,6 +83,24 @@ function TopBar() {
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <input
+              type="file"
+              id="upload-photo"
+              accept="image/*"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const selected = e.target.files[0];
+                if (selected) {
+                  setFile(selected);
+                  useUploadPhoto.mutate(selected);
+                }
+              }}
+            />
+            <label htmlFor="upload-photo">
+              <IconButton component="span">
+                <AddPhotoAlternateOutlinedIcon />
+              </IconButton>
+            </label>
             <Typography variant="h5" color="inherit">
               {parsedPath.includes("photos") && userId ? `Photos of ${userDetails.first_name} ${userDetails.last_name}` : ''}
               {!(parsedPath.includes("photos") || parsedPath.includes("comments")) && userId ? `${userDetails.first_name} ${userDetails.last_name}` : ''}
