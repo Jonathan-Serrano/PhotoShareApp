@@ -95,7 +95,6 @@ export const logoutOfAccount = async () => {
 
 export const registerAccount = async (loginName, password, firstName, lastName, location, description, occupation) => {
   try {
-    console.log("here");
     const res = await api.post('/user', {
       login_name: loginName, 
       password: password, 
