@@ -9,8 +9,10 @@ import mongoose from "mongoose";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import bluebird from "bluebird";
 import express from "express";
+import multer from "multer";
+import fs from "fs/promises";
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 
 // ToDO - Your submission should work without this line. Comment out or delete this line for tests and before submission!
 // import models from "./modelData/photoApp.js";
@@ -27,6 +29,8 @@ const portno = 3001; // Port number to use
 const app = express();
 
 app.use(express.json());
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Enable CORS for all routes
 app.use((req, res, next) => {
@@ -415,6 +419,37 @@ app.post('/commentsOfPhoto/:photo_id', requireLogin, async (request, response) =
 
     return response.status(200).json(newComment);
   } catch (err) {
+    return response.status(500).json({ error: 'Server error' });
+  }
+});
+
+/**
+ * POST /photos/new - Upload a photo.
+ */
+app.post('/photos/new', requireLogin, upload.single('uploadedphoto'), async (request, response) => {
+  // Validate file
+  if (!request.file) {
+    return response.status(400).json({ error: 'No file uploaded' });
+  }
+
+  try {
+    const timestamp = Date.now();
+    const filename = `U${timestamp}-${request.file.originalname}`;
+
+    const filePath = join(__dirname, 'images', filename);
+    await fs.writeFile(filePath, request.file.buffer);
+
+    const newPhoto = new Photo({
+      file_name: filename,
+      user_id: request.session.user._id,
+      date_time: new Date(),
+    });
+
+    await newPhoto.save();
+
+    return response.status(200).json(newPhoto);
+  } catch (err) {
+    console.error("Upload error:", err);
     return response.status(500).json({ error: 'Server error' });
   }
 });

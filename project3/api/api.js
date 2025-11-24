@@ -102,3 +102,23 @@ export const addComment = async (photoId, comment) => {
     throw err;
   }
 };
+
+// Upload photo
+export const uploadPhoto = async (file) => {
+  try {
+    const formData = new FormData();
+    if (file) {
+      formData.append('uploadedphoto', file);
+    }
+
+    const res = await api.post('/photos/new', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Error:', err);
+    throw error;
+  }
+};
