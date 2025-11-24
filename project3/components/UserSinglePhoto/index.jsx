@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef }  from 'react';
+import React, { useEffect, useRef }  from 'react';
 import { useNavigate, Link } from "react-router-dom";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
@@ -13,8 +13,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
-import { fetchPhotos } from '../../api/api.js';
-import useAppStore from '../../store/useAppStore.js';
+import { fetchPhotos } from '../../api/api';
+import useAppStore from '../../store/useAppStore';
 
 function UserSinglePhoto({ userId, index}) {
 
@@ -27,7 +27,7 @@ function UserSinglePhoto({ userId, index}) {
   const firstRun = useRef(true);
 
   // Fetch user photos
-  const { data: photos = [], isLoading, error } = useQuery({
+  const { data: photos = [] } = useQuery({
     queryKey: ["photos", userId],
     queryFn: () => fetchPhotos(userId),
   });

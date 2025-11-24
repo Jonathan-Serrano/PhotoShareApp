@@ -15,8 +15,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
-import { fetchComments } from '../../api/api.js';
-import useAppStore from '../../store/useAppStore.js';
+import { fetchComments } from '../../api/api';
+import useAppStore from '../../store/useAppStore';
 
 function UserComments({ userId }) {
 
@@ -27,7 +27,7 @@ function UserComments({ userId }) {
     const navigate = useNavigate();
 
     // Fetch user comment details
-    const { data: commentDetails = [], isLoading, error } = useQuery({
+    const { data: commentDetails = [] } = useQuery({
         queryKey: ["commentDetails", userId],
         queryFn: () => fetchComments(userId),
     });

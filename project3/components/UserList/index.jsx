@@ -12,8 +12,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
-import { fetchUsers, fetchPhotoCounts, fetchCommentCounts } from '../../api/api.js';
-import useAppStore from '../../store/useAppStore.js';
+import { fetchUsers, fetchPhotoCounts, fetchCommentCounts } from '../../api/api';
+import useAppStore from '../../store/useAppStore';
 
 function UserList() {
 
@@ -24,7 +24,7 @@ function UserList() {
   const navigate = useNavigate();
 
   // Fetch user list
-  const { data: users = [], isLoading, error } = useQuery({
+  const { data: users = [] } = useQuery({
     queryKey: ["users"],
     queryFn: () => fetchUsers(),
   });
@@ -33,14 +33,14 @@ function UserList() {
   const shouldFetch = users.length > 0 && isChecked;
 
   // Fetch photo counts
-  const { data: photoCounts = {}, isLoading: photoLoading } = useQuery({
+  const { data: photoCounts = {} } = useQuery({
     queryKey: ['photoCounts'],
     queryFn: fetchPhotoCounts,
     enabled: shouldFetch, 
   });
 
   // Fetch comment counts
-  const { data: commentCounts = {}, isLoading: commentLoading } = useQuery({
+  const { data: commentCounts = {} } = useQuery({
     queryKey: ['commentCounts'],
     queryFn: fetchCommentCounts,
     enabled: shouldFetch,

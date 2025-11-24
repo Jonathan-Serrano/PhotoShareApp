@@ -12,8 +12,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
-import { fetchPhotos } from '../../api/api.js';
-import useAppStore from '../../store/useAppStore.js';
+import { fetchPhotos } from '../../api/api';
+import useAppStore from '../../store/useAppStore';
 
 function UserPhotos({ userId }) {
 
@@ -24,7 +24,7 @@ function UserPhotos({ userId }) {
   const navigate = useNavigate();
 
   // Fetch user photos
-  const { data: photos = [], isLoading, error } = useQuery({
+  const { data: photos = [] } = useQuery({
     queryKey: ["photos", userId],
     queryFn: () => fetchPhotos(userId),
   });

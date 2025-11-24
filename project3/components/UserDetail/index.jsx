@@ -13,8 +13,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 
 import './styles.css';
-import { fetchUser } from '../../api/api.js';
-import useAppStore from '../../store/useAppStore.js';
+import { fetchUser } from '../../api/api';
+import useAppStore from '../../store/useAppStore';
 
 function UserDetail({ userId }) {
 
@@ -25,7 +25,7 @@ function UserDetail({ userId }) {
   const navigate = useNavigate();
 
   // Fetch user details
-  const { data: userDetails = {}, isLoading, error } = useQuery({
+  const { data: userDetails = {} } = useQuery({
     queryKey: ["userDetails", userId],
     queryFn: () => fetchUser(userId),
     enabled: !!userId,

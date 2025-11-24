@@ -10,13 +10,12 @@ import {
   Box,
   IconButton
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import LogoutIcon from '@mui/icons-material/Logout';
 
 import './styles.css';
-import { fetchUser, logoutOfAccount } from '../../api/api.js';
-import useAppStore from '../../store/useAppStore.js';
-import { useMutation } from "@tanstack/react-query";
+import { fetchUser, logoutOfAccount } from '../../api/api';
+import useAppStore from '../../store/useAppStore';
 
 function TopBar() {
 
@@ -37,7 +36,7 @@ function TopBar() {
                 : (parsedPath.length >= 4) ? parsedPath[parsedPath.length - 2] : null;
 
   // Fetch user details
-  const { data: userDetails = {}, isLoading, error } = useQuery({
+  const { data: userDetails = {} } = useQuery({
     queryKey: ["userDetails", userId],
     queryFn: () => fetchUser(userId),
     enabled: isLoggedIn && !!userId
@@ -86,8 +85,7 @@ function TopBar() {
               Please Login
             </Typography>
           </Box>
-        )
-      } 
+        )} 
       </Toolbar>
     </AppBar>
   );
