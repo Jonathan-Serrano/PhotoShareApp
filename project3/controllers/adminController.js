@@ -57,14 +57,14 @@ export const logout = async (request, response) => {
     }
 
     return request.session.destroy(err => {
-    if (err) {
-      return response.status(500).json({ error: "Logout failed" });
-    }
+      if (err) {
+        return response.status(500).json({ error: "Logout failed" });
+      }
 
-    response.clearCookie("connect.sid");
+      response.clearCookie("connect.sid");
 
-    return response.status(200).json({ message: "User logged out successfully" });
-  });
+      return response.status(200).json({ message: "User logged out successfully" });
+    });
   } catch (err) {
     return response.status(500).json({ error: "Server error" });
   }

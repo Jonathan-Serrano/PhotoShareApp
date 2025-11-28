@@ -51,7 +51,7 @@ function LoginRegister() {
   });
 
 
-   const register = useMutation({
+  const register = useMutation({
     mutationFn: () => registerAccount(loginName, password, firstName, lastName, 
       location, description, occupation),
     onSuccess: () => {
@@ -105,13 +105,13 @@ function LoginRegister() {
   };
 
   return (
-     onLoginPage ? 
-       (
-       <Container align="center" maxWidth="xs" >
-        <Typography component="h1" variant="h5">
+    onLoginPage ? 
+      (
+        <Container align="center" maxWidth="xs" >
+          <Typography component="h1" variant="h5">
           Sign in
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -144,20 +144,20 @@ function LoginRegister() {
               Sign In
             </Button>
             {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : null }
-        </Box>
+          </Box>
           <Grid item>
             <Button variant="secondary" size="small" sx={{ textTransform: 'none' }} onClick={switchPages}>
               {"Don't have an account? Sign Up"}
             </Button>
           </Grid>
-       </Container>
+        </Container>
       )  : 
       (
-      <Container align="center" maxWidth="xs" >
-        <Typography component="h1" variant="h5">
+        <Container align="center" maxWidth="xs" >
+          <Typography component="h1" variant="h5">
           Register
-        </Typography>
-        <Box component="form" onSubmit={handleRegister} noValidate sx={{ mt: 1 }}>
+          </Typography>
+          <Box component="form" onSubmit={handleRegister} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -257,8 +257,8 @@ function LoginRegister() {
                 {'Already have an account? Login'}
               </Button>
             </Grid>
-        </Box>
-      </Container>
+          </Box>
+        </Container>
       ));
 }
 

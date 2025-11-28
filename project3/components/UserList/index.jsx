@@ -69,12 +69,12 @@ function UserList() {
                 <ListItemButton onClick={() => goToUserDetailsPage(u._id)}>
                   <ListItemText primary={`${u.first_name} ${u.last_name}`.trim()} />
                 </ListItemButton>
-                  { isChecked && photoCounts[u._id] !== undefined && (
-                    <Chip color="success" sx={{ marginLeft: 2 }} label={`${photoCounts[u._id]} ${photoCounts[u._id] === 1 ? 'photo' : 'photos'}`}/>
-                  )}
-                  { isChecked && commentCounts[u._id] !== undefined && (
-                    <Chip onClick={(event) => goToUserCommentsPage(event, u._id)} color="error" sx={{ marginLeft: 2 }} label={`${commentCounts[u._id]} ${commentCounts[u._id] === 1 ? 'comment' : 'comments'}`}/>
-                  )}
+                { isChecked && photoCounts[u._id] !== undefined && (
+                  <Chip color="success" sx={{ marginLeft: 2 }} label={`${photoCounts[u._id]} ${photoCounts[u._id] === 1 ? 'photo' : 'photos'}`}/>
+                )}
+                { isChecked && commentCounts[u._id] !== undefined && (
+                  <Chip onClick={(event) => goToUserCommentsPage(event, u._id)} color="error" sx={{ marginLeft: 2 }} label={`${commentCounts[u._id]} ${commentCounts[u._id] === 1 ? 'comment' : 'comments'}`}/>
+                )}
               </ListItem>
               <Divider />
             </React.Fragment>
