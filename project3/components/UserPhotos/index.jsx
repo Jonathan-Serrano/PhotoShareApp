@@ -40,14 +40,14 @@ function UserPhotos({ userId }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photos', userId] });
       queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
-    }
+    },
   });
 
   const handleAddComment = (photoId, text) => {
     useAddComment.mutate({ photoId, comment: text }, {
       onSuccess: () => {
         setCommentTextById(prev => ({ ...prev, [photoId]: '' }));
-      }
+      },
     });
   };
 

@@ -33,7 +33,7 @@ export const counts = async (request, response) => {
     return response.status(200).json({
       user: userCount,
       photo: photoCount,
-      schemaInfo: schemaInfoCount
+      schemaInfo: schemaInfoCount,
     });
 
   } catch(err){

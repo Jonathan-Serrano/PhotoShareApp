@@ -23,7 +23,7 @@ export const login = async (request, response) => {
 
     request.session.user = {
       _id: user._id,
-      first_name: user.first_name
+      first_name: user.first_name,
     };
 
     return response.json(request.session.user);

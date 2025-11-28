@@ -6,7 +6,7 @@ import mongoose from "mongoose";
  */
 const schemaInfo = new mongoose.Schema({
     load_date_time: { type: String },
-    loaded_from: { type: String }
+    loaded_from: { type: String },
 });
 
 /**

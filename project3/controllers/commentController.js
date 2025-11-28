@@ -76,7 +76,7 @@ export const commentDetails = async (request, response) => {
             photo_id: photo._id,
             file_name: photo.file_name,
             comment: comment.comment,
-            date_time: comment.date_time
+            date_time: comment.date_time,
           });
         }
       });
@@ -100,7 +100,7 @@ export const commentCounts = async (request, response) => {
     // Get comment counts
     const allCommentCounts = await Photo.aggregate([
       { $unwind: "$comments" },
-      { $group: { _id: "$comments.user_id", count: { $sum: 1 } } }
+      { $group: { _id: "$comments.user_id", count: { $sum: 1 } } },
     ]);
 
     // Create map for user IDs to comment counts

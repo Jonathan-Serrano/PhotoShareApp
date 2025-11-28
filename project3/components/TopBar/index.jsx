@@ -8,7 +8,7 @@ import {
   Toolbar,
   Typography,
   Box,
-  Button
+  Button,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -42,7 +42,7 @@ function TopBar() {
   const { data: userDetails = {} } = useQuery({
     queryKey: ['userDetails', userId],
     queryFn: () => fetchUser(userId),
-    enabled: isLoggedIn && !!userId
+    enabled: isLoggedIn && !!userId,
   });
 
   const logout = useMutation({
@@ -51,7 +51,7 @@ function TopBar() {
       setUserInfo(null);
       setIsLoggedIn(false);
       navigate('/login');
-    }
+    },
   });
 
   const useUploadPhoto = useMutation({
@@ -60,7 +60,7 @@ function TopBar() {
       // Refresh the user's photos page
       queryClient.invalidateQueries({ queryKey: ['photos', userId] });
       queryClient.invalidateQueries({ queryKey: ['photoCounts'] });
-    }
+    },
   });
 
   return (

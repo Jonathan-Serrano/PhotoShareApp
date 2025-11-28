@@ -48,7 +48,7 @@ export const userPhotos = async (request, response) => {
       commentUserMap[user._id.toString()] = {
         _id: user._id,
         first_name: user.first_name,
-        last_name: user.last_name
+        last_name: user.last_name,
       };
     });
 
@@ -80,7 +80,7 @@ export const photoCounts = async (request, response) => {
 
     // Get photo counts
     const allPhotoCounts = await Photo.aggregate([
-      { $group: { _id: "$user_id", count: { $sum: 1 } } }
+      { $group: { _id: "$user_id", count: { $sum: 1 } } },
     ]);
 
     // Create map for user IDs to photo counts

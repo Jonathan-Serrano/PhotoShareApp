@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:3001',
-  withCredentials: true  
+  withCredentials: true,  
 });
 
 // ------------ GET REQUESTS ------------
@@ -70,7 +70,7 @@ export const loginToAccount = async (loginName, password) => {
   try {
     const res = await api.post('/admin/login', {
       login_name: loginName,
-      password: password
+      password: password,
     });
     return res.data;
   } catch (err) {
@@ -108,7 +108,7 @@ export const registerAccount = async (loginName, password, firstName, lastName, 
       last_name: lastName, 
       location: location, 
       description: description, 
-      occupation: occupation
+      occupation: occupation,
     });
     return res.data;
   } catch (error) {

@@ -43,7 +43,7 @@ function UserSinglePhoto({ userId, index}) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photos', userId] });
       queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
-    }
+    },
   });
 
   const handleAddComment = (photoId, text) => {

@@ -47,7 +47,7 @@ function LoginRegister() {
     onError: (err) => {
       setErrorMessage(err.response.data);
       setLoginFailed(true);
-    }
+    },
   });
 
 
@@ -69,7 +69,7 @@ function LoginRegister() {
     onError: (err) => {
       setErrorMessage(err.response.data);
       setLoginFailed(true);
-    }
+    },
   });
 
   const handleSubmit = (event) => {

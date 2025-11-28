@@ -51,7 +51,7 @@ app.use(session({
   secret: "none",
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false }
+  cookie: { secure: false },
 }));
 
 function requireLogin(req, res, next) {
@@ -109,6 +109,6 @@ const server = app.listen(portno, function () {
     "Listening at http://localhost:" +
       port +
       " exporting the directory " +
-      __dirname
+      __dirname,
   );
 });
