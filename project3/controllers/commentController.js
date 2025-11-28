@@ -8,14 +8,14 @@ export const commentsOfPhotos = async (request, response) => {
   const { photo_id } = request.params;
   const { comment } = request.body;
 
-  if (!comment || comment.trim() === '') {
-    return response.status(400).json({ error: 'Comment cannot be empty' });
+  if (!comment || comment.trim() === "") {
+    return response.status(400).json({ error: "Comment cannot be empty" });
   }
 
   try {
     const photo = await Photo.findById(photo_id).exec();
     if (!photo) {
-      return response.status(400).json({ error: 'Photo not found' });
+      return response.status(400).json({ error: "Photo not found" });
     }
 
     const newComment = {
@@ -29,7 +29,7 @@ export const commentsOfPhotos = async (request, response) => {
 
     return response.status(200).json(newComment);
   } catch (err) {
-    return response.status(500).json({ error: 'Server error' });
+    return response.status(500).json({ error: "Server error" });
   }
 };
 
@@ -42,7 +42,7 @@ export const commentDetails = async (request, response) => {
 
     // Find photos with comments by the user
     const photos = await Photo.find({ "comments.user_id": userId })
-      .select('_id file_name comments user_id')
+      .select("_id file_name comments user_id")
       .lean();
 
     // Get photo owner IDs and photo IDs
@@ -53,7 +53,7 @@ export const commentDetails = async (request, response) => {
     // Fetch all owner photos concurrently
     await Promise.all(photoOwnerIds.map(async (ownerId) => {
       const ownerPhotos = await Photo.find({ user_id: ownerId })
-        .select('_id')
+        .select("_id")
         .lean();
 
       // Map photo IDs to the index
@@ -84,7 +84,7 @@ export const commentDetails = async (request, response) => {
 
     return response.status(200).json(userComments);
   } catch (err) {
-    return response.status(400).json({ error: 'Comments details error' });
+    return response.status(400).json({ error: "Comments details error" });
   }
 };
 
@@ -95,7 +95,7 @@ export const commentCounts = async (request, response) => {
   try {
 
     // Get all user IDs
-    const users = await User.find().select('_id').lean();
+    const users = await User.find().select("_id").lean();
 
     // Get comment counts
     const allCommentCounts = await Photo.aggregate([
@@ -118,6 +118,6 @@ export const commentCounts = async (request, response) => {
 
     return response.status(200).json(userCommentMap);
   } catch (err) {
-    return response.status(400).json({ error: 'Comments of user error' });
+    return response.status(400).json({ error: "Comments of user error" });
   }
 };

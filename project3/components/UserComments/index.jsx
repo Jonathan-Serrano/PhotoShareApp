@@ -1,5 +1,5 @@
 import React, { useEffect }  from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
 import {
@@ -12,7 +12,7 @@ import {
   Avatar,
   Divider,
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
 import './styles.css';
 import { fetchComments } from '../../api/api.js';
@@ -28,7 +28,7 @@ function UserComments({ userId }) {
 
     // Fetch user comment details
     const { data: commentDetails = [] } = useQuery({
-        queryKey: ["commentDetails", userId],
+        queryKey: ['commentDetails', userId],
         queryFn: () => fetchComments(userId),
     });
 

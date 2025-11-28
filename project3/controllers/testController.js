@@ -13,7 +13,7 @@ export const info = async (request, response) => {
     return response.status(200).json(testInfo);
   }
   catch (err) {
-    return response.status(400).json({ error: 'Schema Info error' });
+    return response.status(400).json({ error: "Schema Info error" });
   }
 };
 
@@ -37,6 +37,6 @@ export const counts = async (request, response) => {
     });
 
   } catch(err){
-    return response.status(400).json({ error: 'Counts error' });
+    return response.status(400).json({ error: "Counts error" });
   }
 };

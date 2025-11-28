@@ -1,4 +1,4 @@
-import { join,dirname } from 'path';
+import { join,dirname } from "path";
 import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import User from "../schema/user.js";
@@ -21,12 +21,12 @@ export const userPhotos = async (request, response) => {
   try {
     // Find photos by user ID
     const photos = await Photo.find({ user_id: request.params.id })
-      .select('_id user_id comments file_name date_time')
+      .select("_id user_id comments file_name date_time")
       .lean(); 
 
     // If no photos found
     if (!photos || photos.length === 0) {
-      return response.status(400).send({ error: 'Photos not found' });
+      return response.status(400).send({ error: "Photos not found" });
     }
 
     // Get all unique user_ids from comments
@@ -39,7 +39,7 @@ export const userPhotos = async (request, response) => {
 
     // Fetch user details for all unique user_ids
     const users = await User.find({ _id: { $in: Array.from(commentUserIds) } })
-      .select('_id first_name last_name')
+      .select("_id first_name last_name")
       .lean();
 
     // Make Comment User Map
@@ -63,7 +63,7 @@ export const userPhotos = async (request, response) => {
 
     return response.status(200).json(photos);
   } catch (err) {
-    return response.status(400).json({ error: 'Photos of user error' });
+    return response.status(400).json({ error: "Photos of user error" });
   }
 };
 
@@ -76,7 +76,7 @@ export const photoCounts = async (request, response) => {
   try {
 
     // Get alll user IDs
-    const users = await User.find().select('_id').lean();
+    const users = await User.find().select("_id").lean();
 
     // Get photo counts
     const allPhotoCounts = await Photo.aggregate([
@@ -98,7 +98,7 @@ export const photoCounts = async (request, response) => {
 
     return response.status(200).json(userPhotoMap);
   } catch (err) {
-    return response.status(400).json({ error: 'Photos of user error' });
+    return response.status(400).json({ error: "Photos of user error" });
   }
 };
 
@@ -109,14 +109,14 @@ export const photoCounts = async (request, response) => {
 export const userPhotoUpload = async (request, response) => {
   // Validate file
   if (!request.file) {
-    return response.status(400).json({ error: 'No file uploaded' });
+    return response.status(400).json({ error: "No file uploaded" });
   }
 
   try {
     const timestamp = Date.now();
     const filename = `U${timestamp}-${request.file.originalname}`;
 
-    const filePath = join(ROOT_DIR, 'images', filename);
+    const filePath = join(ROOT_DIR, "images", filename);
     await fs.writeFile(filePath, request.file.buffer);
 
     const newPhoto = new Photo({
@@ -129,6 +129,6 @@ export const userPhotoUpload = async (request, response) => {
 
     return response.status(200).json(newPhoto);
   } catch (err) {
-    return response.status(500).json({ error: 'Server error' });
+    return response.status(500).json({ error: "Server error" });
   }
 };

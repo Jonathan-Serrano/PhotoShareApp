@@ -58,7 +58,7 @@ function PhotoShare() {
           setIsLoggedIn(true);
         }
       } catch (err) {
-        console.error("Session check failed:", err);
+        console.error('Session check failed:', err);
       } finally {
         setIsLoading(false);
       }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   FormGroup,
   FormControlLabel,
@@ -10,7 +10,7 @@ import {
   Box,
   Button
 } from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 
@@ -34,13 +34,13 @@ function TopBar() {
   // Get user ID
   const location = useLocation();
   const parsedPath = location.pathname.split('/');
-  const userId = (parsedPath.includes("photos") && parsedPath.length < 4) || parsedPath.includes("users") || parsedPath.includes("comments")
+  const userId = (parsedPath.includes('photos') && parsedPath.length < 4) || parsedPath.includes('users') || parsedPath.includes('comments')
                 ? parsedPath[parsedPath.length - 1]
                 : (parsedPath.length >= 4) ? parsedPath[parsedPath.length - 2] : null;
 
   // Fetch user details
   const { data: userDetails = {} } = useQuery({
-    queryKey: ["userDetails", userId],
+    queryKey: ['userDetails', userId],
     queryFn: () => fetchUser(userId),
     enabled: isLoggedIn && !!userId
   });
@@ -58,8 +58,8 @@ function TopBar() {
     mutationFn: uploadPhoto,
     onSuccess: () => {
       // Refresh the user's photos page
-      queryClient.invalidateQueries({ queryKey: ["photos", userId] });
-      queryClient.invalidateQueries({ queryKey: ["photoCounts"] });
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['photoCounts'] });
     }
   });
 
@@ -85,7 +85,7 @@ function TopBar() {
               type="file"
               id="upload-photo"
               accept="image/*"
-              style={{ display: "none" }}
+              style={{ display: 'none' }}
               onChange={(e) => {
                 const selected = e.target.files[0];
                 if (selected) {
@@ -104,9 +104,9 @@ function TopBar() {
               </Button>
             </label>
             <Typography variant="h5" color="inherit">
-              {parsedPath.includes("photos") && userId ? `Photos of ${userDetails.first_name} ${userDetails.last_name}` : ''}
-              {!(parsedPath.includes("photos") || parsedPath.includes("comments")) && userId ? `${userDetails.first_name} ${userDetails.last_name}` : ''}
-              {parsedPath.includes("comments") && userId ? `Comments of ${userDetails.first_name} ${userDetails.last_name}` : ''}
+              {parsedPath.includes('photos') && userId ? `Photos of ${userDetails.first_name} ${userDetails.last_name}` : ''}
+              {!(parsedPath.includes('photos') || parsedPath.includes('comments')) && userId ? `${userDetails.first_name} ${userDetails.last_name}` : ''}
+              {parsedPath.includes('comments') && userId ? `Comments of ${userDetails.first_name} ${userDetails.last_name}` : ''}
             </Typography>
             <Button
               variant="outlined"

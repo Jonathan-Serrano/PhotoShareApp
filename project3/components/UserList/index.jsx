@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import {
   Divider,
   List,
@@ -9,7 +9,7 @@ import {
   Typography,
   Chip,
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
 import './styles.css';
 import { fetchUsers, fetchPhotoCounts, fetchCommentCounts } from '../../api/api.js';
@@ -25,7 +25,7 @@ function UserList() {
 
   // Fetch user list
   const { data: users = [] } = useQuery({
-    queryKey: ["users"],
+    queryKey: ['users'],
     queryFn: () => fetchUsers(),
   });
   

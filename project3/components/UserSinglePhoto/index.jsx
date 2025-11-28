@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef }  from 'react';
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
 import {
@@ -13,7 +13,7 @@ import {
   Button,
   Divider,
 } from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import './styles.css';
 import { fetchPhotos, addComment } from '../../api/api.js';
@@ -34,15 +34,15 @@ function UserSinglePhoto({ userId, index}) {
 
   // Fetch user photos
   const { data: photos = [] } = useQuery({
-    queryKey: ["photos", userId],
+    queryKey: ['photos', userId],
     queryFn: () => fetchPhotos(userId),
   });
 
   const useAddComment = useMutation({
     mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["photos", userId] });
-      queryClient.invalidateQueries({ queryKey: ["commentCounts"] });
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
     }
   });
 
@@ -126,7 +126,7 @@ function UserSinglePhoto({ userId, index}) {
                   <Typography variant="body2" color="text.secondary">
                     <strong>
                       <Link 
-                        className='user-link'
+                        className="user-link"
                         to={`/users/${comment.user._id}`}
                         style={{
                         textDecoration: 'none',

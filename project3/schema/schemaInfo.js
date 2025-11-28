@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 /**
  * Create a Mongoose Schema for SchemaInfo.
@@ -12,7 +12,7 @@ const schemaInfo = new mongoose.Schema({
 /**
  * Create a Mongoose Model for SchemaInfo.
  */
-const SchemaInfo = mongoose.model('SchemaInfo', schemaInfo);
+const SchemaInfo = mongoose.model("SchemaInfo", schemaInfo);
 
 /**
  * Make this available to our application.
