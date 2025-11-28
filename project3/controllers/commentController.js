@@ -1,5 +1,5 @@
 import User from "../schema/user.js";
-import Photo from "../schema/photo.js"; 
+import Photo from "../schema/photo.js";
 
 /**
  * POST /commentsOfPhoto/:photo_id - Add a comment to a photo.

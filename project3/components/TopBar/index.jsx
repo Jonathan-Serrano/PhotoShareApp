@@ -73,9 +73,9 @@ function TopBar() {
               Hi {userAccountInfo.first_name}
               </Typography>
               <FormGroup>
-                <FormControlLabel 
-                  control={<Switch color="secondary" checked={isChecked} onChange={toggleChecked}/>} 
-                  label="Enable Advanced Features" 
+                <FormControlLabel
+                  control={<Switch color="secondary" checked={isChecked} onChange={toggleChecked}/>}
+                  label="Enable Advanced Features"
                 />
               </FormGroup>
             </Box>
@@ -116,7 +116,7 @@ function TopBar() {
               >
               Logout
               </Button>
-            </Box> 
+            </Box>
           </>
         ) : (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -124,7 +124,7 @@ function TopBar() {
               Please Login
             </Typography>
           </Box>
-        )} 
+        )}
       </Toolbar>
     </AppBar>
   );

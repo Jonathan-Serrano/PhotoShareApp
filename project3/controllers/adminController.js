@@ -6,14 +6,14 @@ export const login = async (request, response) => {
   try {
 
     const { login_name, password } = request.body;
-    
+
     if ((!login_name || login_name.trim().length === 0) && (!password || password.trim().length === 0)) {
       return response.status(400).send("Please enter username and password");
     } else if (!login_name || login_name.trim().length === 0){
       return response.status(400).send("Please enter username");
     } else if (!password || password.trim().length === 0) {
       return response.status(400).send("Please enter password");
-    } 
+    }
 
     const user = await User.findOne({ login_name: login_name, password: password });
 
@@ -27,7 +27,7 @@ export const login = async (request, response) => {
     };
 
     return response.json(request.session.user);
-    
+
   } catch (err) {
     return response.status(500).json({ error: "login error" });
   }

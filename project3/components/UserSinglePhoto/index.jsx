@@ -69,7 +69,7 @@ function UserSinglePhoto({ userId, index}) {
       return;
     }
 
-    // Navigate to user photos 
+    // Navigate to user photos
     if (!isChecked) {
       navigate(`/photos/${encodeURIComponent(userId)}`);
     }
@@ -92,7 +92,7 @@ function UserSinglePhoto({ userId, index}) {
             <Typography variant="subtitle1" color="text.primary">
                 Comments:
             </Typography>
-              
+
             <Box sx={{ mb: 3 }}>
               <TextField
                 fullWidth
@@ -125,7 +125,7 @@ function UserSinglePhoto({ userId, index}) {
                 <Box key={comment._id} sx={{ marginBottom: 1 }}>
                   <Typography variant="body2" color="text.secondary">
                     <strong>
-                      <Link 
+                      <Link
                         className="user-link"
                         to={`/users/${comment.user._id}`}
                         style={{
@@ -137,7 +137,7 @@ function UserSinglePhoto({ userId, index}) {
                         {comment.user.first_name} {comment.user.last_name}:
                       </Link>
                       {' '}
-                    </strong> 
+                    </strong>
                     {comment.comment}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
@@ -151,9 +151,9 @@ function UserSinglePhoto({ userId, index}) {
               </Typography>
             )}
           </CardContent>
-        </Card>            
+        </Card>
       </Box>
-      <Pagination sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'center' }} 
+      <Pagination sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'center' }}
         count={photoLength} shape="rounded" onChange={handlePageChange} page={parseInt(index, 10)} />
     </>
   );

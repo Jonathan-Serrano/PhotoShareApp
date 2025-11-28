@@ -28,7 +28,7 @@ function UserList() {
     queryKey: ['users'],
     queryFn: () => fetchUsers(),
   });
-  
+
   // Only fetch photo counts if users exist and checkbox is checked
   const shouldFetch = users.length > 0 && isChecked;
 
@@ -36,7 +36,7 @@ function UserList() {
   const { data: photoCounts = {} } = useQuery({
     queryKey: ['photoCounts'],
     queryFn: fetchPhotoCounts,
-    enabled: shouldFetch, 
+    enabled: shouldFetch,
   });
 
   // Fetch comment counts

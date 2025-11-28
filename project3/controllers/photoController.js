@@ -2,7 +2,7 @@ import { join,dirname } from "path";
 import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import User from "../schema/user.js";
-import Photo from "../schema/photo.js"; 
+import Photo from "../schema/photo.js";
 
 
 
@@ -22,7 +22,7 @@ export const userPhotos = async (request, response) => {
     // Find photos by user ID
     const photos = await Photo.find({ user_id: request.params.id })
       .select("_id user_id comments file_name date_time")
-      .lean(); 
+      .lean();
 
     // If no photos found
     if (!photos || photos.length === 0) {

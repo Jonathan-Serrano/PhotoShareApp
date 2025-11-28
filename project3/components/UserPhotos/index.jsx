@@ -113,7 +113,7 @@ function UserPhotos({ userId }) {
                 <Box key={comment._id} sx={{ marginBottom: 1 }}>
                   <Typography variant="body2" color="text.secondary">
                     <strong>
-                      <Link 
+                      <Link
                         className="user-link"
                         to={`/users/${comment.user._id}`}
                         style={{
@@ -125,7 +125,7 @@ function UserPhotos({ userId }) {
                         {comment.user.first_name} {comment.user.last_name}:
                       </Link>
                       {' '}
-                    </strong> 
+                    </strong>
                     {comment.comment}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">

@@ -35,7 +35,7 @@ function UserComments({ userId }) {
   // If advanced mode is not checked, navigate to user page
   useEffect(() => {
     if(!isChecked) {
-      navigate(`/users/${encodeURIComponent(userId)}`); 
+      navigate(`/users/${encodeURIComponent(userId)}`);
     }
   }, [isChecked]);
 
@@ -44,7 +44,7 @@ function UserComments({ userId }) {
     navigate(`/photos/${encodeURIComponent(photo_user_id)}/${encodeURIComponent(photo_index + 1)}`);
   };
 
-  return ( 
+  return (
     <List>
       {commentDetails.map((comment, index) => (
         <React.Fragment key={index}>
@@ -55,11 +55,11 @@ function UserComments({ userId }) {
               </ListItemAvatar>
               <ListItemText
                 primary={(
-                                    
+
                   <Typography variant="body1" component="span">
                     {comment.comment}
                   </Typography>
-                                    
+
                 )}
                 secondary={(
                   <Typography variant="body2" color="textSecondary">
@@ -70,7 +70,7 @@ function UserComments({ userId }) {
             </ListItem>
           </ListItemButton>
           <Divider />
-        </React.Fragment>         
+        </React.Fragment>
       ))}
     </List>
   );

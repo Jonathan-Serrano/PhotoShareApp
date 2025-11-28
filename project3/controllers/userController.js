@@ -27,7 +27,7 @@ export const userId = async (request, response) => {
   try {
     // Find user by ID
     const user = await User.findById(request.params.id).select("_id first_name last_name location description occupation");
-    
+
     // If user not found
     if (!user) {
       return response.status(400).send("Not found");
@@ -46,7 +46,7 @@ export const user = async (req, res) => {
   try {
     const { login_name, password, first_name, last_name, location, description, occupation } = req.body;
     const missingFields = [];
-    
+
     if (!login_name || login_name.trim().length === 0) missingFields.push("Login Name");
     if (!password || password.trim().length === 0) missingFields.push("Password");
     if (!first_name || first_name.trim().length === 0) missingFields.push("First Name");

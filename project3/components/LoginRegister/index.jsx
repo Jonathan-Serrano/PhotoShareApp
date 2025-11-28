@@ -52,7 +52,7 @@ function LoginRegister() {
 
 
   const register = useMutation({
-    mutationFn: () => registerAccount(loginName, password, firstName, lastName, 
+    mutationFn: () => registerAccount(loginName, password, firstName, lastName,
       location, description, occupation),
     onSuccess: () => {
       setLoginFailed(false);
@@ -105,7 +105,7 @@ function LoginRegister() {
   };
 
   return (
-    onLoginPage ? 
+    onLoginPage ?
       (
         <Container align="center" maxWidth="xs" >
           <Typography component="h1" variant="h5">
@@ -151,7 +151,7 @@ function LoginRegister() {
             </Button>
           </Grid>
         </Container>
-      )  : 
+      )  :
       (
         <Container align="center" maxWidth="xs" >
           <Typography component="h1" variant="h5">
