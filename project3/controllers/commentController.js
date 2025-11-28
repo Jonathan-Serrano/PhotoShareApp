@@ -46,8 +46,8 @@ export const commentDetails = async (request, response) => {
       .lean();
 
     // Get photo owner IDs and photo IDs
-    const photoOwnerIds = [...new Set(photos.map(p => p.user_id.toString()))];
-    const photoIds = new Set(photos.map(p => p._id.toString()));
+    const photoOwnerIds = [...new Set(photos.map((p) => p.user_id.toString()))];
+    const photoIds = new Set(photos.map((p) => p._id.toString()));
     const photoIndexMap = new Map();
 
     // Fetch all owner photos concurrently
@@ -68,7 +68,7 @@ export const commentDetails = async (request, response) => {
     // Extract comments made by the user
     const userComments = [];
     photos.forEach((photo) => {
-      photo.comments.forEach(comment => {
+      photo.comments.forEach((comment) => {
         if (comment.user_id.toString() === userId) {
           userComments.push({
             photo_index: photoIndexMap.get(photo._id.toString()),
@@ -110,7 +110,7 @@ export const commentCounts = async (request, response) => {
     });
 
     // Add users with zero comments
-    users.forEach(user => {
+    users.forEach((user) => {
       if (!userCommentMap[user._id.toString()]) {
         userCommentMap[user._id.toString()] = 0;
       }

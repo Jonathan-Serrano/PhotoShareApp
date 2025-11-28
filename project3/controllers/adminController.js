@@ -56,7 +56,7 @@ export const logout = async (request, response) => {
       return response.status(400).json({ error: "No user Logged in" });
     }
 
-    return request.session.destroy(err => {
+    return request.session.destroy((err) => {
       if (err) {
         return response.status(500).json({ error: "Logout failed" });
       }

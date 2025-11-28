@@ -31,8 +31,8 @@ export const userPhotos = async (request, response) => {
 
     // Get all unique user_ids from comments
     const commentUserIds = new Set();
-    photos.forEach(photo => {
-      photo.comments.forEach(comment => {
+    photos.forEach((photo) => {
+      photo.comments.forEach((comment) => {
         commentUserIds.add(comment.user_id.toString());
       });
     });
@@ -44,7 +44,7 @@ export const userPhotos = async (request, response) => {
 
     // Make Comment User Map
     const commentUserMap = {};
-    users.forEach(user => {
+    users.forEach((user) => {
       commentUserMap[user._id.toString()] = {
         _id: user._id,
         first_name: user.first_name,
@@ -53,8 +53,8 @@ export const userPhotos = async (request, response) => {
     });
 
     // Create corrected comment user info
-    photos.forEach(photo => {
-      photo.comments.forEach(comment => {
+    photos.forEach((photo) => {
+      photo.comments.forEach((comment) => {
         const userInfo = commentUserMap[comment.user_id.toString()];
         comment.user = userInfo;
         delete comment.user_id;
@@ -90,7 +90,7 @@ export const photoCounts = async (request, response) => {
     });
 
     // Add users with zero photos
-    users.forEach(user => {
+    users.forEach((user) => {
       if (!userPhotoMap[user._id.toString()]) {
         userPhotoMap[user._id.toString()] = 0;
       }

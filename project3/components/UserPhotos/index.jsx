@@ -46,7 +46,7 @@ function UserPhotos({ userId }) {
   const handleAddComment = (photoId, text) => {
     useAddComment.mutate({ photoId, comment: text }, {
       onSuccess: () => {
-        setCommentTextById(prev => ({ ...prev, [photoId]: '' }));
+        setCommentTextById((prev) => ({ ...prev, [photoId]: '' }));
       },
     });
   };
@@ -84,7 +84,7 @@ function UserPhotos({ userId }) {
                 placeholder="Type your comment here..."
                 value={commentTextById[photo._id] || ''}
                 onChange={(e) => {
-                  setCommentTextById(prev => ({
+                  setCommentTextById((prev) => ({
                     ...prev,
                     [photo._id]: e.target.value,
                   }));
