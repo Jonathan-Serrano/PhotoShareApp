@@ -65,7 +65,7 @@ Promise.all(removePromises)
             "Adding user:",
             user.first_name + " " + user.last_name,
             " with ID ",
-            user.objectID
+            user.objectID,
           );
         })
         .catch(function (err) {
@@ -104,7 +104,7 @@ Promise.all(removePromises)
                   "Adding comment of length %d by user %s to photo %s",
                   comment.comment.length,
                   comment.user.objectID,
-                  photo.file_name
+                  photo.file_name,
                 );
               });
             }
@@ -113,7 +113,7 @@ Promise.all(removePromises)
               "Adding photo:",
               photo.file_name,
               " of user ID ",
-              photoObj.user_id
+              photoObj.user_id,
             );
           })
           .catch(function (err) {

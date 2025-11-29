@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Typography,
@@ -9,7 +9,7 @@ import {
   Grid,
   Alert,
 } from '@mui/material';
-import { useMutation } from "@tanstack/react-query";
+import { useMutation } from '@tanstack/react-query';
 
 
 import './styles.css';
@@ -23,18 +23,18 @@ function LoginRegister() {
   const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
   const setUserInfo = useAppStore((s) => s.setUserInfo);
   const [loginFailed, setLoginFailed] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [onLoginPage, setOnLoginPage] = useState(true);
   const [registerSuccess, setRegisterSuccess] = useState(false);
 
-  const [loginName, setLoginName] = useState("");
-  const [password, setPassword] = useState("");
-  const [secondPassword, setSecondPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [location, setLocation] = useState("");
-  const [occupation, setOccupation] = useState("");
-  const [description, setDescription] = useState("");
+  const [loginName, setLoginName] = useState('');
+  const [password, setPassword] = useState('');
+  const [secondPassword, setSecondPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [location, setLocation] = useState('');
+  const [occupation, setOccupation] = useState('');
+  const [description, setDescription] = useState('');
 
   const login = useMutation({
     mutationFn: () => loginToAccount(loginName, password),
@@ -47,29 +47,29 @@ function LoginRegister() {
     onError: (err) => {
       setErrorMessage(err.response.data);
       setLoginFailed(true);
-    }
+    },
   });
 
 
-   const register = useMutation({
-    mutationFn: () => registerAccount(loginName, password, firstName, lastName, 
+  const register = useMutation({
+    mutationFn: () => registerAccount(loginName, password, firstName, lastName,
       location, description, occupation),
     onSuccess: () => {
       setLoginFailed(false);
       setRegisterSuccess(true);
-      setLoginName("");
-      setPassword("");
-      setSecondPassword("");
-      setFirstName("");
-      setLastName("");
-      setLocation("");
-      setOccupation("");
-      setDescription("");
+      setLoginName('');
+      setPassword('');
+      setSecondPassword('');
+      setFirstName('');
+      setLastName('');
+      setLocation('');
+      setOccupation('');
+      setDescription('');
     },
     onError: (err) => {
       setErrorMessage(err.response.data);
       setLoginFailed(true);
-    }
+    },
   });
 
   const handleSubmit = (event) => {
@@ -80,16 +80,16 @@ function LoginRegister() {
   const switchPages = () => {
     setOnLoginPage(!onLoginPage);
     setLoginFailed(false);
-    setErrorMessage("");
+    setErrorMessage('');
 
-    setLoginName("");
-    setPassword("");
-    setSecondPassword("");
-    setFirstName("");
-    setLastName("");
-    setLocation("");
-    setOccupation("");
-    setDescription("");
+    setLoginName('');
+    setPassword('');
+    setSecondPassword('');
+    setFirstName('');
+    setLastName('');
+    setLocation('');
+    setOccupation('');
+    setDescription('');
   };
 
   const handleRegister = (event) => {
@@ -97,7 +97,7 @@ function LoginRegister() {
 
     // Check if passwords match
     if (password !== secondPassword) {
-      setErrorMessage("Passwords do not match");
+      setErrorMessage('Passwords do not match');
       setLoginFailed(true);
       return;
     }
@@ -105,13 +105,13 @@ function LoginRegister() {
   };
 
   return (
-     onLoginPage ? 
-       (
-       <Container align="center" maxWidth="xs" >
-        <Typography component="h1" variant="h5">
+    onLoginPage ?
+      (
+        <Container align="center" maxWidth="xs" >
+          <Typography component="h1" variant="h5">
           Sign in
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -144,20 +144,20 @@ function LoginRegister() {
               Sign In
             </Button>
             {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : null }
-        </Box>
+          </Box>
           <Grid item>
-            <Button variant="secondary" size="small" sx={{ textTransform: "none" }} onClick={switchPages}>
+            <Button variant="secondary" size="small" sx={{ textTransform: 'none' }} onClick={switchPages}>
               {"Don't have an account? Sign Up"}
             </Button>
           </Grid>
-       </Container>
-      )  : 
+        </Container>
+      )  :
       (
-      <Container align="center" maxWidth="xs" >
-        <Typography component="h1" variant="h5">
+        <Container align="center" maxWidth="xs" >
+          <Typography component="h1" variant="h5">
           Register
-        </Typography>
-        <Box component="form" onSubmit={handleRegister} noValidate sx={{ mt: 1 }}>
+          </Typography>
+          <Box component="form" onSubmit={handleRegister} noValidate sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -253,12 +253,12 @@ function LoginRegister() {
             {loginFailed ?  <Alert sx={{ mt: 1, mb: 1  }} severity="error">{errorMessage}</Alert> : null }
             {registerSuccess ? <Alert sx={{ mt: 1, mb: 1  }} severity="success"> Registered account successfuly </Alert> :null}
             <Grid item>
-              <Button variant="secondary" size="small" sx={{ textTransform: "none" }} onClick={switchPages}>
-                {"Already have an account? Login"}
+              <Button variant="secondary" size="small" sx={{ textTransform: 'none' }} onClick={switchPages}>
+                {'Already have an account? Login'}
               </Button>
             </Grid>
-        </Box>
-      </Container>
+          </Box>
+        </Container>
       ));
 }
 

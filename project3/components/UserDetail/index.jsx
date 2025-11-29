@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
 
@@ -10,7 +10,7 @@ import {
   Button,
   Typography,
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
 import './styles.css';
 import { fetchUser } from '../../api/api.js';
@@ -26,7 +26,7 @@ function UserDetail({ userId }) {
 
   // Fetch user details
   const { data: userDetails = {} } = useQuery({
-    queryKey: ["userDetails", userId],
+    queryKey: ['userDetails', userId],
     queryFn: () => fetchUser(userId),
     enabled: !!userId,
   });

@@ -12,10 +12,10 @@ export const userList = async (request, response) => {
 
   try {
     // Find all users
-    const users = await User.find().select('_id first_name last_name');
+    const users = await User.find().select("_id first_name last_name");
     return response.status(200).json(users);
   } catch (err) {
-    return response.status(500).json({ error: 'User list error' });
+    return response.status(500).json({ error: "User list error" });
   }
 };
 
@@ -26,8 +26,8 @@ export const userId = async (request, response) => {
 
   try {
     // Find user by ID
-    const user = await User.findById(request.params.id).select('_id first_name last_name location description occupation');
-    
+    const user = await User.findById(request.params.id).select("_id first_name last_name location description occupation");
+
     // If user not found
     if (!user) {
       return response.status(400).send("Not found");
@@ -35,7 +35,7 @@ export const userId = async (request, response) => {
 
     return response.status(200).json(user);
   } catch (err) {
-    return response.status(400).json({ error: 'User info error' });
+    return response.status(400).json({ error: "User info error" });
   }
 };
 
@@ -46,7 +46,7 @@ export const user = async (req, res) => {
   try {
     const { login_name, password, first_name, last_name, location, description, occupation } = req.body;
     const missingFields = [];
-    
+
     if (!login_name || login_name.trim().length === 0) missingFields.push("Login Name");
     if (!password || password.trim().length === 0) missingFields.push("Password");
     if (!first_name || first_name.trim().length === 0) missingFields.push("First Name");
@@ -58,7 +58,7 @@ export const user = async (req, res) => {
 
     const userAccount = await User.findOne({ login_name });
     if (userAccount) {
-      return res.status(400).send('Login Name already exists');
+      return res.status(400).send("Login Name already exists");
     }
 
     const newUser = await User.create({
@@ -66,9 +66,9 @@ export const user = async (req, res) => {
       password: password.trim(),
       first_name: first_name.trim(),
       last_name: last_name.trim(),
-      location: location ? location.trim() : '',
-      description: description ? description.trim() : '',
-      occupation: occupation ? occupation.trim() : '',
+      location: location ? location.trim() : "",
+      description: description ? description.trim() : "",
+      occupation: occupation ? occupation.trim() : "",
     });
 
     return res.status(200).send({
@@ -77,6 +77,6 @@ export const user = async (req, res) => {
     });
 
   } catch (err) {
-    return res.status(500).send({ error: 'Server error' });
+    return res.status(500).send({ error: "Server error" });
   }
 };

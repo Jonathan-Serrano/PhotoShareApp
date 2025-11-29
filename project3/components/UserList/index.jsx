@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import {
   Divider,
   List,
@@ -9,7 +9,7 @@ import {
   Typography,
   Chip,
 } from '@mui/material';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
 import './styles.css';
 import { fetchUsers, fetchPhotoCounts, fetchCommentCounts } from '../../api/api.js';
@@ -25,10 +25,10 @@ function UserList() {
 
   // Fetch user list
   const { data: users = [] } = useQuery({
-    queryKey: ["users"],
+    queryKey: ['users'],
     queryFn: () => fetchUsers(),
   });
-  
+
   // Only fetch photo counts if users exist and checkbox is checked
   const shouldFetch = users.length > 0 && isChecked;
 
@@ -36,7 +36,7 @@ function UserList() {
   const { data: photoCounts = {} } = useQuery({
     queryKey: ['photoCounts'],
     queryFn: fetchPhotoCounts,
-    enabled: shouldFetch, 
+    enabled: shouldFetch,
   });
 
   // Fetch comment counts
@@ -69,12 +69,12 @@ function UserList() {
                 <ListItemButton onClick={() => goToUserDetailsPage(u._id)}>
                   <ListItemText primary={`${u.first_name} ${u.last_name}`.trim()} />
                 </ListItemButton>
-                  { isChecked && photoCounts[u._id] !== undefined && (
-                    <Chip color="success" sx={{ marginLeft: 2 }} label={`${photoCounts[u._id]} ${photoCounts[u._id] === 1 ? 'photo' : 'photos'}`}/>
-                  )}
-                  { isChecked && commentCounts[u._id] !== undefined && (
-                    <Chip onClick={(event) => goToUserCommentsPage(event, u._id)} color="error" sx={{ marginLeft: 2 }} label={`${commentCounts[u._id]} ${commentCounts[u._id] === 1 ? 'comment' : 'comments'}`}/>
-                  )}
+                { isChecked && photoCounts[u._id] !== undefined && (
+                  <Chip color="success" sx={{ marginLeft: 2 }} label={`${photoCounts[u._id]} ${photoCounts[u._id] === 1 ? 'photo' : 'photos'}`}/>
+                )}
+                { isChecked && commentCounts[u._id] !== undefined && (
+                  <Chip onClick={(event) => goToUserCommentsPage(event, u._id)} color="error" sx={{ marginLeft: 2 }} label={`${commentCounts[u._id]} ${commentCounts[u._id] === 1 ? 'comment' : 'comments'}`}/>
+                )}
               </ListItem>
               <Divider />
             </React.Fragment>
