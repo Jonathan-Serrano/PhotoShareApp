@@ -58,13 +58,13 @@ function PhotoShare() {
           setIsLoggedIn(true);
         }
       } catch (err) {
-        console.error("Session check failed:", err);
+        console.error('Session check failed:', err);
       } finally {
         setIsLoading(false);
       }
     };
     CheckSession();
-  }, [setUserInfo, setIsLoggedIn]); 
+  }, [setUserInfo, setIsLoggedIn]);
 
   if (isLoading) {
     return (<div>Loading...</div>);
@@ -79,7 +79,7 @@ function PhotoShare() {
               <TopBar />
             </Grid>
             <div className="main-topbar-buffer"/>
-            {isLoggedIn ? ( 
+            {isLoggedIn ? (
               <Grid item sm={3}>
                 <Paper className="main-grid-item" sx={{height: '88.5vh', overflowY: 'auto'}}>
                   {<UserList />}

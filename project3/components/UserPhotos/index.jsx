@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
 import {
@@ -12,7 +12,7 @@ import {
   Button,
   Divider,
 } from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import './styles.css';
 import { fetchPhotos, addComment } from '../../api/api.js';
@@ -31,23 +31,23 @@ function UserPhotos({ userId }) {
 
   // Fetch user photos
   const { data: photos = [] } = useQuery({
-    queryKey: ["photos", userId],
+    queryKey: ['photos', userId],
     queryFn: () => fetchPhotos(userId),
   });
 
   const useAddComment = useMutation({
     mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["photos", userId] });
-      queryClient.invalidateQueries({ queryKey: ["commentCounts"] });
-    }
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+    },
   });
 
   const handleAddComment = (photoId, text) => {
     useAddComment.mutate({ photoId, comment: text }, {
       onSuccess: () => {
-        setCommentTextById(prev => ({ ...prev, [photoId]: '' }));
-      }
+        setCommentTextById((prev) => ({ ...prev, [photoId]: '' }));
+      },
     });
   };
 
@@ -84,7 +84,7 @@ function UserPhotos({ userId }) {
                 placeholder="Type your comment here..."
                 value={commentTextById[photo._id] || ''}
                 onChange={(e) => {
-                  setCommentTextById(prev => ({
+                  setCommentTextById((prev) => ({
                     ...prev,
                     [photo._id]: e.target.value,
                   }));
@@ -113,8 +113,8 @@ function UserPhotos({ userId }) {
                 <Box key={comment._id} sx={{ marginBottom: 1 }}>
                   <Typography variant="body2" color="text.secondary">
                     <strong>
-                      <Link 
-                        className='user-link'
+                      <Link
+                        className="user-link"
                         to={`/users/${comment.user._id}`}
                         style={{
                           textDecoration: 'none',
@@ -125,7 +125,7 @@ function UserPhotos({ userId }) {
                         {comment.user.first_name} {comment.user.last_name}:
                       </Link>
                       {' '}
-                    </strong> 
+                    </strong>
                     {comment.comment}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">

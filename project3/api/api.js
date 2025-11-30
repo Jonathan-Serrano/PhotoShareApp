@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "http://localhost:3001",
-  withCredentials: true  
+  baseURL: 'http://localhost:3001',
+  withCredentials: true,
 });
 
 // ------------ GET REQUESTS ------------
@@ -70,7 +70,7 @@ export const loginToAccount = async (loginName, password) => {
   try {
     const res = await api.post('/admin/login', {
       login_name: loginName,
-      password: password
+      password: password,
     });
     return res.data;
   } catch (err) {
@@ -102,13 +102,13 @@ export const logoutOfAccount = async () => {
 export const registerAccount = async (loginName, password, firstName, lastName, location, description, occupation) => {
   try {
     const res = await api.post('/user', {
-      login_name: loginName, 
-      password: password, 
-      first_name: firstName, 
-      last_name: lastName, 
-      location: location, 
-      description: description, 
-      occupation: occupation
+      login_name: loginName,
+      password: password,
+      first_name: firstName,
+      last_name: lastName,
+      location: location,
+      description: description,
+      occupation: occupation,
     });
     return res.data;
   } catch (error) {

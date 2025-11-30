@@ -10,8 +10,8 @@ import mongoose from "mongoose";
 import bluebird from "bluebird";
 import express from "express";
 import multer from "multer";
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import session from "express-session";
 import { login, currentUser, logout } from "./controllers/adminController.js";
 import { commentsOfPhotos, commentDetails, commentCounts } from "./controllers/commentController.js";
@@ -36,11 +36,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Enable CORS for all routes
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  if (req.method === 'OPTIONS') {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  if (req.method === "OPTIONS") {
     res.sendStatus(200);
   } else {
     next();
@@ -48,10 +48,10 @@ app.use((req, res, next) => {
 });
 
 app.use(session({
-  secret: 'none',
+  secret: "none",
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false }
+  cookie: { secure: false },
 }));
 
 function requireLogin(req, res, next) {
@@ -78,29 +78,29 @@ app.use(express.static(__dirname));
 
 
 // Admin Controller
-app.post('/admin/login', login);
-app.get('/admin/currentUser', currentUser);
-app.post('/admin/logout', logout);
+app.post("/admin/login", login);
+app.get("/admin/currentUser", currentUser);
+app.post("/admin/logout", logout);
 
 // Test Controller
-app.get('/test/info', requireLogin, info);
-app.get('/test/counts', requireLogin, counts);
+app.get("/test/info", requireLogin, info);
+app.get("/test/counts", requireLogin, counts);
 
 // User Controller
-app.get('/', requireLogin, base);
-app.get('/user/list', requireLogin, userList);
-app.get('/user/:id', requireLogin, userId);
-app.post('/user', user);
+app.get("/", requireLogin, base);
+app.get("/user/list", requireLogin, userList);
+app.get("/user/:id", requireLogin, userId);
+app.post("/user", user);
 
 // Photo Controller
-app.get('/photosOfUser/:id', requireLogin, userPhotos);
-app.get('/usersPhotoCounts', requireLogin, photoCounts);
-app.post('/photos/new', requireLogin, upload.single('uploadedphoto'), userPhotoUpload);
+app.get("/photosOfUser/:id", requireLogin, userPhotos);
+app.get("/usersPhotoCounts", requireLogin, photoCounts);
+app.post("/photos/new", requireLogin, upload.single("uploadedphoto"), userPhotoUpload);
 
 // Comment Controller
-app.post('/commentsOfPhoto/:photo_id', requireLogin, commentsOfPhotos);
-app.get('/usersCommentDetails/:id', requireLogin, commentDetails);
-app.get('/usersCommentCounts', requireLogin, commentCounts);
+app.post("/commentsOfPhoto/:photo_id", requireLogin, commentsOfPhotos);
+app.get("/usersCommentDetails/:id", requireLogin, commentDetails);
+app.get("/usersCommentCounts", requireLogin, commentCounts);
 
 
 const server = app.listen(portno, function () {
@@ -109,6 +109,6 @@ const server = app.listen(portno, function () {
     "Listening at http://localhost:" +
       port +
       " exporting the directory " +
-      __dirname
+      __dirname,
   );
 });
