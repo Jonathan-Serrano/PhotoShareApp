@@ -63,7 +63,7 @@ function requireLogin(req, res, next) {
 
 mongoose.Promise = bluebird;
 mongoose.set("strictQuery", false);
-const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/project3";
+const mongoUri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/project4";
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
