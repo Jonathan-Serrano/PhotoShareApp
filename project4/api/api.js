@@ -1,0 +1,149 @@
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:3001',
+  withCredentials: true,
+});
+
+// ------------ GET REQUESTS ------------
+export const fetchUsers = async () => {
+  try {
+    const res = await api.get('/user/list');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const fetchUser = async (userId) => {
+  try {
+    const res = await api.get(`/user/${encodeURIComponent(userId)}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const fetchPhotos = async (userId) => {
+  try {
+    const res = await api.get(`/photosOfUser/${encodeURIComponent(userId)}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const fetchComments = async (userId) => {
+  try {
+    const res = await api.get(`/usersCommentDetails/${encodeURIComponent(userId)}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const fetchPhotoCounts = async () => {
+  try {
+    const res = await api.get('/usersPhotoCounts');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const fetchCommentCounts = async () => {
+  try {
+    const res = await api.get('/usersCommentCounts');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const loginToAccount = async (loginName, password) => {
+  try {
+    const res = await api.post('/admin/login', {
+      login_name: loginName,
+      password: password,
+    });
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const res = await api.get('/admin/currentUser');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const logoutOfAccount = async () => {
+  try {
+    const res = await api.post('/admin/logout');
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const registerAccount = async (loginName, password, firstName, lastName, location, description, occupation) => {
+  try {
+    const res = await api.post('/user', {
+      login_name: loginName,
+      password: password,
+      first_name: firstName,
+      last_name: lastName,
+      location: location,
+      description: description,
+      occupation: occupation,
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Error registering user:', error);
+    throw error;
+  }
+};
+
+// Comments
+export const addComment = async (photoId, comment) => {
+  try {
+    const res = await api.post(`/commentsOfPhoto/${photoId}`, { comment });
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+// Upload photo
+export const uploadPhoto = async (file) => {
+  try {
+    const formData = new FormData();
+    if (file) {
+      formData.append('uploadedphoto', file);
+    }
+
+    const res = await api.post('/photos/new', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
