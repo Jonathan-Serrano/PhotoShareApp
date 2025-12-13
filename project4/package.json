@@ -1,8 +1,8 @@
 {
-  "name": "project3",
+  "name": "project4",
   "version": "1.0.0",
   "private": true,
-  "description": "Project 3: State, Sessions and Input (React + Vite + Axios + TanStack Query + Zustand)",
+  "description": "Project 4: Photo App Sprint (React + Vite + Axios + TanStack Query + Zustand)",
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
@@ -34,7 +34,10 @@
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-mentions": "^4.4.10",
     "react-router-dom": "^6.26.2",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
