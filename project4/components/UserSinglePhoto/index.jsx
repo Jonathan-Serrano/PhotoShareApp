@@ -7,6 +7,7 @@ import {
   Card,
   CardMedia,
   CardContent,
+  IconButton,
   Typography,
   Pagination,
   TextField,
@@ -14,9 +15,10 @@ import {
   Divider,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import './styles.css';
-import { fetchPhotos, addComment } from '../../api/api.js';
+import { fetchPhotos, addComment, fetchFavorites, addFavorite, removeFavorite  } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function UserSinglePhoto({ userId, index}) {
@@ -37,6 +39,70 @@ function UserSinglePhoto({ userId, index}) {
     queryKey: ['photos', userId],
     queryFn: () => fetchPhotos(userId),
   });
+
+  const { data: favorites = [] } = useQuery({
+    queryKey: ['favorites'],
+    queryFn: () => fetchFavorites(),
+  });
+
+  const handleToggleFavorite = (photo) => {
+    const DateTime = new Date(photo.date_time).toISOString();
+
+    const isFavorite = favorites.some(
+      (f) => String(f.photo_id._id) === String(photo._id)
+    );
+
+    if (isFavorite) {
+      removeFavoriteMutation.mutate(photo._id);
+    } else {
+      addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
+    }
+  };
+  
+  const useAddFavorite = (queryClient) => {
+
+    return useMutation({
+      mutationFn: ({ photoId, DateTime }) => addFavorite(photoId, DateTime),
+
+      onMutate: async ({ photoId }) => {
+        await queryClient.cancelQueries({ queryKey: ['favorites'] });
+
+        const prev = queryClient.getQueryData(['favorites']);
+
+        queryClient.setQueryData(['favorites'], (old = []) => [
+          ...old,
+          { photo_id: photoId },
+        ]);
+
+        return { prev };
+      },
+      onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    },
+    });
+  };
+  
+  const useRemoveFavorite = (queryClient) => {
+
+    return useMutation({
+      mutationFn: (photoId) => removeFavorite(photoId),
+
+      onMutate: async (photoId) => {
+        await queryClient.cancelQueries({ queryKey: ['favorites'] });
+
+        const prev = queryClient.getQueryData(['favorites']);
+
+        queryClient.setQueryData(['favorites'], (old = []) =>
+          old.filter((f) => String(f.photo_id._id) !== String(photoId))
+        );
+
+        return { prev };
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      },
+    });
+  };
 
   const useAddComment = useMutation({
     mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
@@ -75,6 +141,9 @@ function UserSinglePhoto({ userId, index}) {
     }
   }, [isChecked]);
 
+  const addFavoriteMutation = useAddFavorite(queryClient);
+  const removeFavoriteMutation = useRemoveFavorite(queryClient);
+
   return (
     <>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'center' }}>
@@ -86,13 +155,21 @@ function UserSinglePhoto({ userId, index}) {
             alt={photo.file_name}
           />
           <CardContent>
-            <Typography variant="body2" color="text.primary">
-              <strong>Posted On:</strong> {new Date(photo.date_time).toLocaleString()}
-            </Typography>
-            <Typography variant="subtitle1" color="text.primary">
-                Comments:
-            </Typography>
-
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="body2" color="text.primary">
+                  <strong>Posted On:</strong> {new Date(photo.date_time).toLocaleString()}
+                </Typography>
+                <Typography variant="subtitle1" color="text.primary">
+                  Comments:
+                </Typography>
+              </Box>
+              <IconButton onClick={() => handleToggleFavorite(photo)}>
+                {favorites && favorites.some((f) => String(f.photo_id._id) === String(photo._id))
+                  ? <FavoriteIcon color="error" />
+                  : <FavoriteBorderIcon />}
+              </IconButton>
+            </Box>
             <Box sx={{ mb: 3 }}>
               <TextField
                 fullWidth

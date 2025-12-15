@@ -18,6 +18,7 @@ import UserSinglePhoto from './components/UserSinglePhoto';
 import UserComments from './components/UserComments';
 import useAppStore from './store/useAppStore.js';
 import LoginRegister from './components/LoginRegister';
+import Favorites from './components/Favorites/index.jsx';
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ function PhotoShare() {
                   <Route path="/photos/:userId" element={isLoggedIn ? <UserPhotosRoute /> :  <Navigate to="/login" />} />
                   <Route path="/comments/:userId" element={isLoggedIn ? <UserCommentsRoute /> :  <Navigate to="/login" />} />
                   <Route path="/users" element={isLoggedIn ? <UserList /> :  <Navigate to="/login" />} />
+                  <Route path="/favorites" element={isLoggedIn ? <Favorites /> :  <Navigate to="/login" />} />
                   <Route path="/*" element={isLoggedIn ? <Navigate to={`/users/${encodeURIComponent(userInfo._id)}`} /> :  <Navigate to="/login" /> }/>
                   <Route path="/" element={isLoggedIn ? <Navigate to={`/users/${encodeURIComponent(userInfo._id)}`} /> :  <Navigate to="/login" /> }/>
                 </Routes>

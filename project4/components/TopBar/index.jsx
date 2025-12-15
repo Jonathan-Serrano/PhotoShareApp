@@ -13,6 +13,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 import './styles.css';
 import { fetchUser, logoutOfAccount, uploadPhoto } from '../../api/api.js';
@@ -93,6 +94,14 @@ function TopBar() {
                   }
                 }}
               />
+              <Button
+                variant="outlined"
+                color="inherit"
+                startIcon={<FavoriteBorderIcon />}
+                onClick={() => navigate('/favorites')}
+              >
+              Favorites
+              </Button>
               <label htmlFor="upload-photo" style={{ display: 'inline-block', cursor: 'pointer' }}>
                 <Button
                   component="span"

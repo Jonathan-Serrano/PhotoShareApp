@@ -147,3 +147,34 @@ export const uploadPhoto = async (file) => {
     throw err;
   }
 };
+
+export const fetchFavorites = async () => {
+  try {
+    const res = await api.get(`/favoriteCheck`);
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const addFavorite = async (photoId, DateTime) => {
+  try {
+    const res = await api.post('/favorite', { photo_id: photoId, date_time: DateTime });
+    return res.data;
+  } catch (err) {
+    console.error('Error', err);
+    throw err;
+  }
+};
+ 
+
+export const removeFavorite = async (photoId) => {
+  try {
+    const res = await api.delete(`/favorite/${photoId}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error', err);
+    throw err;
+  }
+};
