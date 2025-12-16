@@ -18,6 +18,7 @@ import { commentsOfPhotos, commentDetails, commentCounts } from "./controllers/c
 import { userPhotos, photoCounts, userPhotoUpload } from "./controllers/photoController.js";
 import { info, counts } from "./controllers/testController.js";
 import { base, userList, userId, user } from "./controllers/userController.js";
+import { favoriteCheckList, addFavorite, removeFavorite } from "./controllers/favoriteController.js";
 
 // ToDO - Your submission should work without this line. Comment out or delete this line for tests and before submission!
 // import models from "./modelData/photoApp.js";
@@ -101,6 +102,11 @@ app.post("/photos/new", requireLogin, upload.single("uploadedphoto"), userPhotoU
 app.post("/commentsOfPhoto/:photo_id", requireLogin, commentsOfPhotos);
 app.get("/usersCommentDetails/:id", requireLogin, commentDetails);
 app.get("/usersCommentCounts", requireLogin, commentCounts);
+
+// Favorite Controller
+app.get("/favoriteCheck", requireLogin, favoriteCheckList);
+app.post("/favorite", requireLogin, addFavorite);
+app.delete("/favorite/:photoId", requireLogin, removeFavorite);
 
 
 const server = app.listen(portno, function () {
