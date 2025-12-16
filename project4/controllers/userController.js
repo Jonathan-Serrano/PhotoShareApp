@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import User from "../schema/user.js";
 import Photo from "../schema/photo.js";
+import Favorite from "../schema/favorite.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -97,9 +98,6 @@ export const userDeletion = async (request, response) => {
   try {
     const sessionUserId = request.session.user._id; 
     const { userId } = request.params;
-    console.log(sessionUserId)
-    console.log(userId)
-
 
     if (sessionUserId !== userId) {
       return response.status(403).json({ error: "Cannot delete account not belonging to you" });
@@ -122,6 +120,9 @@ export const userDeletion = async (request, response) => {
 
     // Delete Comments:
     await Photo.updateMany( {}, { $pull: { comments: { user_id: userId } } });
+
+    // Delete Favorites:
+    await Favorite.deleteMany({ user_id: userId });
 
     // Delete User:
     await User.deleteOne({ _id: userId });

@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import User from "../schema/user.js";
 import Photo from "../schema/photo.js";
+import Favorite from "../schema/favorite.js";
 
 
 
@@ -233,6 +234,9 @@ export const photoDeletion = async (request, response) => {
     } catch (err) {
       console.warn("file not found", err.message);
     }
+
+    // Delete Favorites of this photo
+    await Favorite.deleteMany({ photo_id: photoId });
 
     return response.status(200).json({message: "Comment was deleted sucessfully"});
   } catch (err) {
