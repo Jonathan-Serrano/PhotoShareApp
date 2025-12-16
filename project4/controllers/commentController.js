@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 
 import User from "../schema/user.js";
 import Photo from "../schema/photo.js";
-import { getIo } from "../webServer.js";
 
 /**
  * POST /commentsOfPhoto/:photo_id - Add a comment to a photo.
@@ -35,7 +34,7 @@ export const commentsOfPhotos = async (request, response) => {
     photo.comments.push(newComment);
     await photo.save();
 
-    const io = getIo();
+    const io = request.app.get("io");
     if (io && validMentionIds.length > 0) {
       const user = await User.findById(photo.user_id)
         .select("_id first_name last_name")

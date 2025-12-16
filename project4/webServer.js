@@ -16,11 +16,12 @@ import { dirname } from "path";
 import { Server } from "socket.io";
 import session from "express-session";
 import { login, currentUser, logout } from "./controllers/adminController.js";
-import { commentsOfPhotos, commentDetails, commentCounts, commentDeletion } from "./controllers/commentController.js";
 import { userPhotos, photoCounts, mentions, userPhotoUpload, photoDeletion } from "./controllers/photoController.js";
 import { info, counts } from "./controllers/testController.js";
 import { base, userList, userId, user, userDeletion} from "./controllers/userController.js";
 import { favoriteCheckList, addFavorite, removeFavorite } from "./controllers/favoriteController.js";
+import { commentsOfPhotos, commentDetails, commentCounts, commentDeletion } from "./controllers/commentController.js";
+
 
 // ToDO - Your submission should work without this line. Comment out or delete this line for tests and before submission!
 // import models from "./modelData/photoApp.js";
@@ -123,21 +124,23 @@ const io = new Server(server, {
 });
 export default io;
 
+app.set("io", io);
+
 export const getIo = () => io;
 
 io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
 
-  socket.on("watchMentions", ({ userId }) => {
-    if (!userId) return;
-    socket.join(`user:${userId}`);
-    console.log(`Socket ${socket.id} joined room user:${userId}`);
+  socket.on("watchMentions", ({ userId: targetUserId }) => {
+    if (!targetUserId) return;
+    socket.join(`user:${targetUserId}`);
+    console.log(`Socket ${socket.id} joined room user:${targetUserId}`);
   });
 
-  socket.on("unwatchMentions", ({ userId }) => {
-    if (!userId) return;
-    socket.leave(`user:${userId}`);
-    console.log(`Socket ${socket.id} left room user:${userId}`);
+  socket.on("unwatchMentions", ({ userId: targetUserId }) => {
+    if (!targetUserId) return;
+    socket.leave(`user:${targetUserId}`);
+    console.log(`Socket ${socket.id} left room user:${targetUserId}`);
   });
 
   socket.on("disconnect", () => {

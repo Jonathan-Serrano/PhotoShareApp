@@ -9,7 +9,7 @@ on any photo by typing in '@'. When you do so, a list of user will
 appear below and you can select one of them for your mention. 
 Once you added a comment, you may go to their user deatil view and
 see if they have any mentions. This story has the socket functionality
-implemented into it.
+implemented into it. This story has sockets implemented with it.
 
 
 Story number and name: 5. (Deleting comments, photos, and users)
@@ -43,7 +43,7 @@ You may also click on the photo and a modal of the photo will pop up.
 Total Story Points: 16
 
 Marketing Video URL (ensure permissions are set to public viewing):
-
+https://youtu.be/PrHzoJQFbKo
 
 Is it OK if we post your Marketing Video URL on the class discussion forum?
 No
