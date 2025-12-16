@@ -15,7 +15,7 @@ import { dirname } from "path";
 import session from "express-session";
 import { login, currentUser, logout } from "./controllers/adminController.js";
 import { commentsOfPhotos, commentDetails, commentCounts } from "./controllers/commentController.js";
-import { userPhotos, photoCounts, userPhotoUpload } from "./controllers/photoController.js";
+import { userPhotos, photoCounts, mentions, userPhotoUpload } from "./controllers/photoController.js";
 import { info, counts } from "./controllers/testController.js";
 import { base, userList, userId, user } from "./controllers/userController.js";
 import { favoriteCheckList, addFavorite, removeFavorite } from "./controllers/favoriteController.js";
@@ -96,6 +96,7 @@ app.post("/user", user);
 // Photo Controller
 app.get("/photosOfUser/:id", requireLogin, userPhotos);
 app.get("/usersPhotoCounts", requireLogin, photoCounts);
+app.get("/usersMentions/:id", requireLogin, mentions);
 app.post("/photos/new", requireLogin, upload.single("uploadedphoto"), userPhotoUpload);
 
 // Comment Controller

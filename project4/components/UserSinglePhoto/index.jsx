@@ -10,21 +10,26 @@ import {
   IconButton,
   Typography,
   Pagination,
-  TextField,
   Button,
   Divider,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { MentionsInput, Mention } from 'react-mentions';
+
 import './styles.css';
-import { fetchPhotos, addComment, fetchFavorites, addFavorite, removeFavorite  } from '../../api/api.js';
+import { fetchPhotos, addComment, fetchFavorites, addFavorite, removeFavorite , fetchUsers } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
+import mentionStyle from '../mentionStyle.js';
+import mentionsInputStyle from '../mentionsInputStyle.js';
 
 function UserSinglePhoto({ userId, index}) {
 
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
+  const [commentValue, setCommentValue] = useState('');
+  const [mentions, setMentions] = useState([]);
 
   // Access isChecked and setIsChecked from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
@@ -105,16 +110,32 @@ function UserSinglePhoto({ userId, index}) {
   };
 
   const useAddComment = useMutation({
-    mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
+    mutationFn: ({ photoId, comment }) => addComment(photoId, comment, mentions),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photos', userId] });
       queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+      queryClient.invalidateQueries({ queryKey: ['mentions', userId] });
     },
   });
 
+  // Fetch user list
+  const { data: users = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => fetchUsers(),
+  });
+
+  const mentionUsers = users.map((u) => ({
+    id: u._id,
+    display: `${u.first_name} ${u.last_name}`,
+  }));
+
   const handleAddComment = (photoId, text) => {
     useAddComment.mutate({ photoId, comment: text }, {
-      onSuccess: () => setCommentText(''),
+      onSuccess: () => {
+        setCommentValue('');
+        setCommentText('');
+        setMentions([]);
+      },
     });
   };
 
@@ -171,18 +192,39 @@ function UserSinglePhoto({ userId, index}) {
               </IconButton>
             </Box>
             <Box sx={{ mb: 3 }}>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                placeholder="Type your comment here..."
-                value={commentText}
-                onChange={(e) => {
-                  setCommentText(e.target.value);
+              <Box
+                sx={{
+                  mb: 1,
+                  borderRadius: 1,
+                  border: '1px solid rgba(0,0,0,0.23)',
+                  '&:hover': {
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                  },
+                  '&:focus-within': {
+                    borderColor: 'primary.main',
+                    borderWidth: 1,
+                  },
                 }}
-                disabled={useAddComment.isPending}
-                sx={{ mb: 1 }}
-              />
+              >
+                <MentionsInput
+                  style={mentionsInputStyle}
+                  value={commentValue}
+                  onChange={(event, newValue, newPlainTextValue, newMentions) => {
+                    setCommentValue(newValue);
+                    setCommentText(newPlainTextValue); // clean text
+                    setMentions(newMentions || []);
+                  }}
+                  placeholder="Type your comment here... Use '@' for mention"
+                  disabled={useAddComment.isPending}
+                >
+                  <Mention
+                    trigger="@"
+                    data={mentionUsers}
+                    displayTransform={(id, display) => `@${display}`}
+                    style={mentionStyle}
+                  />
+                </MentionsInput>
+              </Box>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                   variant="contained"

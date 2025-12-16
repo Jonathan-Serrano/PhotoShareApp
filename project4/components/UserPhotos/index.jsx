@@ -9,21 +9,26 @@ import {
   CardContent,
   IconButton,
   Typography,
-  TextField,
   Button,
   Divider,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { MentionsInput, Mention } from 'react-mentions';
+
 import './styles.css';
-import { fetchPhotos, addComment, fetchFavorites, addFavorite, removeFavorite } from '../../api/api.js';
+import { fetchPhotos, addComment, fetchFavorites, addFavorite, removeFavorite, fetchUsers } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
+import mentionStyle from '../mentionStyle.js';
+import mentionsInputStyle from '../mentionsInputStyle.js';
 
 function UserPhotos({ userId }) {
 
   const queryClient = useQueryClient();
   const [commentTextById, setCommentTextById] = useState({});
+  const [commentValueById, setCommentValueById] = useState({});
+  const [mentionsById, setMentionsById] = useState({});
 
   // Access isChecked from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
@@ -104,17 +109,31 @@ function UserPhotos({ userId }) {
 
 
   const useAddComment = useMutation({
-    mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
+    mutationFn: ({ photoId, comment, mentions }) => addComment(photoId, comment, mentions),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photos', userId] });
       queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+      queryClient.invalidateQueries({ queryKey: ['mentions', userId] });
     },
   });
 
-  const handleAddComment = (photoId, text) => {
-    useAddComment.mutate({ photoId, comment: text }, {
+  // Fetch user list
+  const { data: users = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => fetchUsers(),
+  });
+
+  const mentionUsers = users.map((u) => ({
+    id: u._id,
+    display: `${u.first_name} ${u.last_name}`,
+  }));
+
+  const handleAddComment = (photoId, text, mentions = []) => {
+    useAddComment.mutate({ photoId, comment: text, mentions }, {
       onSuccess: () => {
+        setCommentValueById((prev) => ({ ...prev, [photoId]: '' }));
         setCommentTextById((prev) => ({ ...prev, [photoId]: '' }));
+        setMentionsById((prev) => ({ ...prev, [photoId]: [] }));
       },
     });
   };
@@ -157,27 +176,45 @@ function UserPhotos({ userId }) {
               </IconButton>
             </Box>
             <Box sx={{ mb: 3 }}>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                placeholder="Type your comment here..."
-                value={commentTextById[photo._id] || ''}
-                onChange={(e) => {
-                  setCommentTextById((prev) => ({
-                    ...prev,
-                    [photo._id]: e.target.value,
-                  }));
+              <Box
+                sx={{
+                  mb: 1,
+                  borderRadius: 1,
+                  border: '1px solid rgba(0,0,0,0.23)',
+                  '&:hover': {
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                  },
+                  '&:focus-within': {
+                    borderColor: 'primary.main',
+                    borderWidth: 1,
+                  },
                 }}
-                disabled={useAddComment.isPending}
-                sx={{ mb: 1 }}
-              />
+              >
+                <MentionsInput
+                  style={mentionsInputStyle}
+                  value={commentValueById[photo._id] || ''}
+                  onChange={(event, newValue, newPlainTextValue, newMentions) => {
+                    setCommentValueById((prev) => ({ ...prev, [photo._id]: newValue }));
+                    setCommentTextById((prev) => ({ ...prev, [photo._id]: newPlainTextValue })); // clean text
+                    setMentionsById((prev) => ({ ...prev, [photo._id]: newMentions || [] }));
+                  }}
+                  placeholder="Type your comment here... Use '@' for mention"
+                  disabled={useAddComment.isPending}
+                >
+                  <Mention
+                    trigger="@"
+                    data={mentionUsers}
+                    displayTransform={(id, display) => `@${display}`}
+                    style={mentionStyle}
+                  />
+                </MentionsInput>
+              </Box>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    handleAddComment(photo._id, commentTextById[photo._id] || '');
+                    handleAddComment(photo._id, commentTextById[photo._id] || '', mentionsById[photo._id] || '');
                   }}
                   disabled={useAddComment.isPending}
                   sx={{ textTransform: 'none' }}
