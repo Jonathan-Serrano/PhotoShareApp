@@ -1,47 +1,53 @@
 Project 4 - Submission Form
 
-Please fill in this form and submit it with your Project 4.
 
-Enter no more than 6 user stories that you did for the assignment
-that you would like to be graded on. 
-Additionally, specify the story for which you implemented real-time updates.
-
-For each story include the following information:
-
-Story number and name:
-Story points:
+Story number and name: 2. (@mentions in comments)
+Story points: 6
 Brief description to see the story in action:
+When you are logged in, you can add a mention to any comment section
+on any photo by typing in '@'. When you do so, a list of user will 
+appear below and you can select one of them for your mention. 
+Once you added a comment, you may go to their user deatil view and
+see if they have any mentions. This story has the socket functionality
+implemented into it.
 
-Total Story Points:
+
+Story number and name: 5. (Deleting comments, photos, and users)
+Story points: 4
+Brief description to see the story in action:
+Next to every comment that user logged in made, there is a button  
+that says "DELETE COMMENT". If you click on it, the comment will
+be deleted. The Advanced Features of viewing the comment count will 
+automatically be updated. Under each of the photos that the user that
+is logged in posted will have a "DELETE PHOTO" button. If you click 
+on it, the photo will be deleted. The Advanced Features of viewing 
+the photo count will automatically be updated. Finally, at the Top 
+Bar, there is a button to delete your account. If you click on it,
+a modal will show up to confirm the deletion. If you accept, all of 
+your comments, photos and favorites will be deleted, and your account 
+as well. You can no longer log back in with that user. If you log in
+with a different user, you will be able to see all of these changes.
+
+
+Story number and name: 7. (Favorite list of photos for users)
+Story points: 6
+Brief description to see the story in action:
+Under each Photo of any user, there will be a heart-shaped icon that 
+you may press. If you do, it will favorite the photo and turn red. 
+You can unfavorite it by clicking on it again and the red filling
+will go away. At the Top bar, there is a button where you can go to
+the favorites page. Here you can see all of your favorited photos.
+There will be an 'x' on the top right of each photo to unfavorite it.
+You may also click on the photo and a modal of the photo will pop up.
+
+Total Story Points: 16
 
 Marketing Video URL (ensure permissions are set to public viewing):
 
+
 Is it OK if we post your Marketing Video URL on the class discussion forum?
-[Yes/No]
+No
 
 Any special instructions for grading (it should be easy for someone to run your
 app from a new machine):
-
-**************** Example **********************
-* As an example: if you did only story 5, your file would look like:
-* 
-* Story number and name:  5 - Activity Feed
-* Story points:  4
-* Brief description to see the story in action:
-* Push the button labeled Activity on the toolbar to view the 
-* 10 most recent activities of the current user.
-* 
-* Total Story Points: 4
-* 
-* Marketing Video URL (ensure permissions are set to public viewing):
-* http://www.youtube.com ---
-* 
-* Is it OK if we post your Marketing Video URL on the class discussion forum?
-* Yes
-* 
-* Any special instructions for grading (it should be easy 
-* for someone to run your app from a new machine):
-* None
-
-**************** Example **********************
-
+None
