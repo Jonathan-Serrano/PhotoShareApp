@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import PropTypes from 'prop-types';
@@ -16,13 +16,16 @@ import {
   Avatar,
   Divider,
 } from '@mui/material';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import './styles.css';
 import { fetchUser, fetchMentions } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
+import socket from '../../socket.js';
 
 function UserDetail({ userId }) {
+
+  const queryClient = useQueryClient();
 
   // Access isChecked from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
@@ -43,6 +46,26 @@ function UserDetail({ userId }) {
     queryFn: () => fetchMentions(userId),
     enabled: !!userId,
   });
+
+  useEffect(() => {
+    if (!userId) {
+      return () => {};
+    }
+
+    socket.emit('watchMentions', { userId });
+
+    const handleNewMention = () => {
+      queryClient.invalidateQueries({ queryKey: ['mentions', userId] });
+      console.log('signal');
+    };
+
+    socket.on('mention:new', handleNewMention);
+
+    return () => {
+      socket.emit('unwatchMentions', { userId });
+      socket.off('mention:new', handleNewMention);
+    };
+  }, [userId, queryClient]);
 
   // Navigate to user photos page
   const viewPhotos = () => {

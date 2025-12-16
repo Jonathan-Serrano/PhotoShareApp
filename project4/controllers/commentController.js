@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import User from "../schema/user.js";
 import Photo from "../schema/photo.js";
+import { getIo } from "../webServer.js";
 
 /**
  * POST /commentsOfPhoto/:photo_id - Add a comment to a photo.
@@ -33,6 +34,33 @@ export const commentsOfPhotos = async (request, response) => {
 
     photo.comments.push(newComment);
     await photo.save();
+
+    const io = getIo();
+    if (io && validMentionIds.length > 0) {
+      const user = await User.findById(photo.user_id)
+        .select("_id first_name last_name")
+        .lean()
+        .exec();
+
+      const userPhotos = await Photo.find({ user_id: photo.user_id })
+        .select("_id")
+        .lean()
+        .exec();
+      const indexInUserPhotos = userPhotos.findIndex((p) => p._id.toString() === photo._id.toString()) + 1;
+
+      const mentionPayload = {
+        photo_index: indexInUserPhotos,
+        user: user,
+        photo_id: photo._id,
+        file_name: photo.file_name,
+        comment: comment.comment,
+        date_time: photo.date_time,
+      };
+
+      validMentionIds.forEach((mentionedUserId) => {
+        io.to(`user:${mentionedUserId.toString()}`).emit("mention:new", mentionPayload);
+      });
+    }
 
     return response.status(200).json(newComment);
   } catch (err) {
@@ -142,7 +170,7 @@ export const commentDeletion = async (request, response) => {
     if (!photo || !photo.comments || photo.comments.length === 0) {
       return response.status(400).send({ error: "Could not delete comment" });
     }
-    
+
     await Photo.updateOne(
       {
         _id: photoId,
@@ -150,8 +178,8 @@ export const commentDeletion = async (request, response) => {
         "comments.user_id": userId,
       },
       {
-        $pull: { comments: { _id: commentId } }
-      }
+        $pull: { comments: { _id: commentId } },
+      },
     );
 
     return response.status(200).json({message: "Comment was deleted sucessfully"});

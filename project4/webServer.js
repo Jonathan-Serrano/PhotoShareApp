@@ -9,9 +9,11 @@ import mongoose from "mongoose";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import bluebird from "bluebird";
 import express from "express";
+import http from "http";
 import multer from "multer";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import { Server } from "socket.io";
 import session from "express-session";
 import { login, currentUser, logout } from "./controllers/adminController.js";
 import { commentsOfPhotos, commentDetails, commentCounts, commentDeletion } from "./controllers/commentController.js";
@@ -112,12 +114,41 @@ app.get("/favoriteCheck", requireLogin, favoriteCheckList);
 app.post("/favorite", requireLogin, addFavorite);
 app.delete("/favorite/:photoId", requireLogin, removeFavorite);
 
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // React app
+    credentials: true,
+  },
+});
+export default io;
 
-const server = app.listen(portno, function () {
-  const port = server.address().port;
+export const getIo = () => io;
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  socket.on("watchMentions", ({ userId }) => {
+    if (!userId) return;
+    socket.join(`user:${userId}`);
+    console.log(`Socket ${socket.id} joined room user:${userId}`);
+  });
+
+  socket.on("unwatchMentions", ({ userId }) => {
+    if (!userId) return;
+    socket.leave(`user:${userId}`);
+    console.log(`Socket ${socket.id} left room user:${userId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id);
+  });
+});
+
+server.listen(portno, () => {
   console.log(
     "Listening at http://localhost:" +
-      port +
+      portno +
       " exporting the directory " +
       __dirname,
   );
