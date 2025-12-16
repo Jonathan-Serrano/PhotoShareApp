@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import User from "../schema/user.js";
 import Photo from "../schema/photo.js";
 
@@ -6,7 +8,7 @@ import Photo from "../schema/photo.js";
  */
 export const commentsOfPhotos = async (request, response) => {
   const { photo_id } = request.params;
-  const { comment } = request.body;
+  const { comment, mentions = [] } = request.body;
 
   if (!comment || comment.trim() === "") {
     return response.status(400).json({ error: "Comment cannot be empty" });
@@ -18,10 +20,15 @@ export const commentsOfPhotos = async (request, response) => {
       return response.status(400).json({ error: "Photo not found" });
     }
 
+    const validMentionIds = mentions
+      .filter((id) => mongoose.Types.ObjectId.isValid(id))
+      .map((id) => new mongoose.Types.ObjectId(id));
+
     const newComment = {
       comment,
       date_time: new Date(),
       user_id: request.session.user._id,
+      mentions: validMentionIds,
     };
 
     photo.comments.push(newComment);

@@ -7,21 +7,28 @@ import {
   Card,
   CardMedia,
   CardContent,
+  IconButton,
   Typography,
-  TextField,
   Button,
   Divider,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { MentionsInput, Mention } from 'react-mentions';
 
 import './styles.css';
-import { fetchPhotos, addComment, deleteComment, deletePhoto } from '../../api/api.js';
+import { fetchPhotos, addComment, fetchFavorites, addFavorite, removeFavorite, fetchUsers, deleteComment, deletePhoto } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
+import mentionStyle from '../mentionStyle.js';
+import mentionsInputStyle from '../mentionsInputStyle.js';
 
 function UserPhotos({ userId }) {
 
   const queryClient = useQueryClient();
   const [commentTextById, setCommentTextById] = useState({});
+  const [commentValueById, setCommentValueById] = useState({});
+  const [mentionsById, setMentionsById] = useState({});
 
   // Access from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
@@ -36,21 +43,102 @@ function UserPhotos({ userId }) {
     queryFn: () => fetchPhotos(userId),
   });
 
-  const useAddComment = useMutation({
-    mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
-      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
-    },
+  const { data: favorites = [] } = useQuery({
+    queryKey: ['favorites'],
+    queryFn: () => fetchFavorites(),
   });
 
-  const handleAddComment = (photoId, text) => {
-    useAddComment.mutate({ photoId, comment: text }, {
+  const handleToggleFavorite = (photo) => {
+    const DateTime = new Date(photo.date_time).toISOString();
+
+    const isFavorite = favorites.some(
+      (f) => String(f.photo_id._id) === String(photo._id),
+    );
+
+    if (isFavorite) {
+      removeFavoriteMutation.mutate(photo._id);
+    } else {
+      addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
+    }
+  };
+
+  const useAddFavorite = (queryClient) => {
+
+    return useMutation({
+      mutationFn: ({ photoId, DateTime }) => addFavorite(photoId, DateTime),
+
+      onMutate: async ({ photoId }) => {
+        await queryClient.cancelQueries({ queryKey: ['favorites'] });
+
+        const prev = queryClient.getQueryData(['favorites']);
+
+        queryClient.setQueryData(['favorites'], (old = []) => [
+          ...old,
+          { photo_id: photoId },
+        ]);
+
+        return { prev };
+      },
       onSuccess: () => {
-        setCommentTextById((prev) => ({ ...prev, [photoId]: '' }));
+        queryClient.invalidateQueries({ queryKey: ['favorites'] });
       },
     });
   };
+
+  const useRemoveFavorite = (queryClient) => {
+
+    return useMutation({
+      mutationFn: (photoId) => removeFavorite(photoId),
+
+      onMutate: async (photoId) => {
+        await queryClient.cancelQueries({ queryKey: ['favorites'] });
+
+        const prev = queryClient.getQueryData(['favorites']);
+
+        queryClient.setQueryData(['favorites'], (old = []) =>
+          old.filter((f) => String(f.photo_id._id) !== String(photoId)),
+        );
+
+        return { prev };
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      },
+    });
+  };
+
+
+
+  const useAddComment = useMutation({
+    mutationFn: ({ photoId, comment, mentions }) => addComment(photoId, comment, mentions),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+      queryClient.invalidateQueries({ queryKey: ['mentions', userId] });
+    },
+  });
+
+  // Fetch user list
+  const { data: users = [] } = useQuery({
+    queryKey: ['users'],
+    queryFn: () => fetchUsers(),
+  });
+
+  const mentionUsers = users.map((u) => ({
+    id: u._id,
+    display: `${u.first_name} ${u.last_name}`,
+  }));
+
+  const handleAddComment = (photoId, text, mentions = []) => {
+    useAddComment.mutate({ photoId, comment: text, mentions }, {
+      onSuccess: () => {
+        setCommentValueById((prev) => ({ ...prev, [photoId]: '' }));
+        setCommentTextById((prev) => ({ ...prev, [photoId]: '' }));
+        setMentionsById((prev) => ({ ...prev, [photoId]: [] }));
+      },
+    });
+  };
+
 
   useEffect(() => {
     // Navigate to first photo if advanced features is on
@@ -58,6 +146,9 @@ function UserPhotos({ userId }) {
       navigate(`/photos/${encodeURIComponent(userId)}/1`);
     }
   }, [isChecked]);
+
+  const addFavoriteMutation = useAddFavorite(queryClient);
+  const removeFavoriteMutation = useRemoveFavorite(queryClient);
 
   const useDeleteComment = useMutation({
     mutationFn: ({ photoId, commentId }) => deleteComment(photoId, commentId),
@@ -87,40 +178,66 @@ function UserPhotos({ userId }) {
             alt={photo.file_name}
           />
           <CardContent>
-            <Typography variant="body2" color="text.primary">
-              <strong>Posted On:</strong> {new Date(photo.date_time).toLocaleString()}
-            </Typography>
-            {userInfo?._id === photo.user_id && (
-            <Button color="error" onClick={() => deletePhotoMutation.mutate(photo._id)}>
-              Delete Photo
-            </Button>
-            )}
-            <Typography variant="subtitle1" color="text.primary">
-              Comments:
-            </Typography>
-
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant="body2" color="text.primary">
+                  <strong>Posted On:</strong> {new Date(photo.date_time).toLocaleString()}
+                </Typography>
+                {userInfo?._id === photo.user_id && (
+                <Button color="error" onClick={() => deletePhotoMutation.mutate(photo._id)}>
+                  Delete Photo
+                </Button>
+                )}
+                <Typography variant="subtitle1" color="text.primary">
+                  Comments:
+                </Typography>
+              </Box>
+              <IconButton onClick={() => handleToggleFavorite(photo)}>
+                {favorites && favorites.some((f) => String(f.photo_id._id) === String(photo._id))
+                  ? <FavoriteIcon color="error" />
+                  : <FavoriteBorderIcon />}
+              </IconButton>
+            </Box>
             <Box sx={{ mb: 3 }}>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                placeholder="Type your comment here..."
-                value={commentTextById[photo._id] || ''}
-                onChange={(e) => {
-                  setCommentTextById((prev) => ({
-                    ...prev,
-                    [photo._id]: e.target.value,
-                  }));
+              <Box
+                sx={{
+                  mb: 1,
+                  borderRadius: 1,
+                  border: '1px solid rgba(0,0,0,0.23)',
+                  '&:hover': {
+                    borderColor: 'rgba(0, 0, 0, 1)',
+                  },
+                  '&:focus-within': {
+                    borderColor: 'primary.main',
+                    borderWidth: 1,
+                  },
                 }}
-                disabled={useAddComment.isPending}
-                sx={{ mb: 1 }}
-              />
+              >
+                <MentionsInput
+                  style={mentionsInputStyle}
+                  value={commentValueById[photo._id] || ''}
+                  onChange={(event, newValue, newPlainTextValue, newMentions) => {
+                    setCommentValueById((prev) => ({ ...prev, [photo._id]: newValue }));
+                    setCommentTextById((prev) => ({ ...prev, [photo._id]: newPlainTextValue })); // clean text
+                    setMentionsById((prev) => ({ ...prev, [photo._id]: newMentions || [] }));
+                  }}
+                  placeholder="Type your comment here... Use '@' for mention"
+                  disabled={useAddComment.isPending}
+                >
+                  <Mention
+                    trigger="@"
+                    data={mentionUsers}
+                    displayTransform={(id, display) => `@${display}`}
+                    style={mentionStyle}
+                  />
+                </MentionsInput>
+              </Box>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    handleAddComment(photo._id, commentTextById[photo._id] || '');
+                    handleAddComment(photo._id, commentTextById[photo._id] || '', mentionsById[photo._id] || '');
                   }}
                   disabled={useAddComment.isPending}
                   sx={{ textTransform: 'none' }}

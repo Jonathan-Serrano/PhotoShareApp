@@ -14,6 +14,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 import './styles.css';
 import { fetchUser, logoutOfAccount, uploadPhoto, deleteAccount } from '../../api/api.js';
@@ -107,6 +108,14 @@ function TopBar() {
                   }
                 }}
               />
+              <Button
+                variant="outlined"
+                color="inherit"
+                startIcon={<FavoriteBorderIcon />}
+                onClick={() => navigate('/favorites')}
+              >
+              Favorites
+              </Button>
               <Button variant="outlined" color="error" startIcon={<DeleteForeverIcon /> } 
                 onClick={() => {
                   if (window.confirm('Are you sure you want to delete your account?')) {
