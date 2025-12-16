@@ -92,7 +92,7 @@ app.get("/", requireLogin, base);
 app.get("/user/list", requireLogin, userList);
 app.get("/user/:id", requireLogin, userId);
 app.post("/user", user);
-app.delete("/user/:userId", requireLogin, userDeletion);
+app.delete("/user/:userID", requireLogin, userDeletion);
 
 // Photo Controller
 app.get("/photosOfUser/:id", requireLogin, userPhotos);

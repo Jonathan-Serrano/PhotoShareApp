@@ -140,10 +140,10 @@ export const commentDeletion = async (request, response) => {
     const photo = await Photo.findOne({ _id: photoId, "comments._id": commentId }, { "comments.$": 1 } );
 
     if (!photo || !photo.comments || photo.comments.length === 0) {
-      return res.status(400).send({ error: "Could not delete comment" });
+      return response.status(400).send({ error: "Could not delete comment" });
     }
     
-    const result = await Photo.updateOne(
+    await Photo.updateOne(
       {
         _id: photoId,
         "comments._id": commentId,

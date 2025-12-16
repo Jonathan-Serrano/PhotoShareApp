@@ -97,35 +97,37 @@ export const user = async (req, res) => {
 export const userDeletion = async (request, response) => {  
   try {
     const sessionUserId = request.session.user._id; 
-    const { userId } = request.params;
+    const { userID } = request.params;
 
-    if (sessionUserId !== userId) {
+    if (sessionUserId !== userID) {
       return response.status(403).json({ error: "Cannot delete account not belonging to you" });
     }
 
-    const userPhotos = await Photo.find({ user_id: userId });
+    const userPhotos = await Photo.find({ user_id: userID });
 
     // Delete Photos 
 
-    await Photo.deleteMany({ user_id: userId });
+    await Photo.deleteMany({ user_id: userID });
 
-    for (const photo of userPhotos) {
-      const filePath = join(ROOT_DIR, "images", photo.file_name);
-      try {
-        await fs.unlink(filePath);
-      } catch (err) {
-        console.warn("file not found", err.message);
-      }
-    }
+    await Promise.all(
+      userPhotos.map(async (photo) => {
+        const filePath = join(ROOT_DIR, "images", photo.file_name);
+        try {
+          await fs.unlink(filePath);
+        } catch (err) {
+          console.warn("file not found", err.message);
+        }
+      })
+    );
 
     // Delete Comments:
-    await Photo.updateMany( {}, { $pull: { comments: { user_id: userId } } });
+    await Photo.updateMany( {}, { $pull: { comments: { user_id: userID } } });
 
     // Delete Favorites:
-    await Favorite.deleteMany({ user_id: userId });
+    await Favorite.deleteMany({ user_id: userID });
 
     // Delete User:
-    await User.deleteOne({ _id: userId });
+    await User.deleteOne({ _id: userID });
 
     // Destroy Session
     request.session.destroy(() => {});

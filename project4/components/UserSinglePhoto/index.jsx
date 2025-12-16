@@ -41,7 +41,7 @@ function UserSinglePhoto({ userId, index}) {
   const firstRun = useRef(true);
 
   // Fetch user photos
-  const { data: photos = [], isLoading } = useQuery({
+  const { data: photos = [] } = useQuery({
     queryKey: ['photos', userId],
     queryFn: () => fetchPhotos(userId),
   });
@@ -54,21 +54,7 @@ function UserSinglePhoto({ userId, index}) {
     queryFn: () => fetchFavorites(),
   });
 
-  const handleToggleFavorite = (photo) => {
-    const DateTime = new Date(photo.date_time).toISOString();
-
-    const isFavorite = favorites.some(
-      (f) => String(f.photo_id._id) === String(photo._id)
-    );
-
-    if (isFavorite) {
-      removeFavoriteMutation.mutate(photo._id);
-    } else {
-      addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
-    }
-  };
-
-  const useAddFavorite = (queryClient) => {
+  const useAddFavorite = () => {
 
     return useMutation({
       mutationFn: ({ photoId, DateTime }) => addFavorite(photoId, DateTime),
@@ -91,7 +77,7 @@ function UserSinglePhoto({ userId, index}) {
     });
   };
 
-  const useRemoveFavorite = (queryClient) => {
+  const useRemoveFavorite = () => {
 
     return useMutation({
       mutationFn: (photoId) => removeFavorite(photoId),
@@ -101,9 +87,7 @@ function UserSinglePhoto({ userId, index}) {
 
         const prev = queryClient.getQueryData(['favorites']);
 
-        queryClient.setQueryData(['favorites'], (old = []) =>
-          old.filter((f) => String(f.photo_id._id) !== String(photoId)),
-        );
+        queryClient.setQueryData(['favorites'], (old = []) => old.filter((f) => String(f.photo_id._id) !== String(photoId)), );
 
         return { prev };
       },
@@ -111,6 +95,23 @@ function UserSinglePhoto({ userId, index}) {
         queryClient.invalidateQueries({ queryKey: ['favorites'] });
       },
     });
+  };
+
+   const addFavoriteMutation = useAddFavorite();
+  const removeFavoriteMutation = useRemoveFavorite();
+
+  const handleToggleFavorite = () => {
+    const DateTime = new Date(photo.date_time).toISOString();
+
+    const isFavorite = favorites.some(
+      (f) => String(f.photo_id._id) === String(photo._id)
+    );
+
+    if (isFavorite) {
+      removeFavoriteMutation.mutate(photo._id);
+    } else {
+      addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
+    }
   };
 
   const useAddComment = useMutation({
@@ -163,9 +164,6 @@ function UserSinglePhoto({ userId, index}) {
     }
   }, [isChecked]);
 
-  const addFavoriteMutation = useAddFavorite(queryClient);
-  const removeFavoriteMutation = useRemoveFavorite(queryClient);
-
   const useDeleteComment = useMutation({
     mutationFn: ({ photoId, commentId }) => deleteComment(photoId, commentId),
     onSuccess: () => {
@@ -186,7 +184,8 @@ function UserSinglePhoto({ userId, index}) {
   return (
     <>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'center' }}>
-        {photoLength > 0 && (
+        {photoLength > 0 && 
+        (
         <Card key={photo._id} sx={{ maxWidth: 500, marginBottom: 2 }}>
           <CardMedia
             component="img"
@@ -209,7 +208,7 @@ function UserSinglePhoto({ userId, index}) {
                   Comments:
                 </Typography>
               </Box>
-              <IconButton onClick={() => handleToggleFavorite(photo)}>
+              <IconButton onClick={() => handleToggleFavorite()}>
                 {favorites && favorites.some((f) => String(f.photo_id._id) === String(photo._id))
                   ? <FavoriteIcon color="error" />
                   : <FavoriteBorderIcon />}
@@ -287,10 +286,12 @@ function UserSinglePhoto({ userId, index}) {
                   <Typography variant="caption" color="text.secondary">
                     {new Date(comment.date_time).toLocaleString()}
                   </Typography>
-                  {userInfo._id === comment.user?._id && (
+                  {userInfo._id === comment.user?._id && 
+                  (
                   <Button size="small" sx={{ml: 2}} onClick={() => useDeleteComment.mutate({ photoId: photo._id, commentId: comment._id })}>
                     Delete Comment
-                  </Button>)}
+                  </Button>
+                  )}
                 </Box>
               ))
             ) : (
@@ -299,7 +300,8 @@ function UserSinglePhoto({ userId, index}) {
               </Typography>
             )}
           </CardContent>
-        </Card> )}
+        </Card> 
+        )}
         {photos.length === 0 && (<Typography>Users has no photos</Typography>)}
       </Box>
       {photoLength > 0 && (

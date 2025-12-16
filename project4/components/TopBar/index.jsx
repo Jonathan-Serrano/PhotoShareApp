@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   FormGroup,
@@ -9,6 +9,10 @@ import {
   Typography,
   Box,
   Button,
+  Dialog, 
+  DialogTitle, 
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -32,6 +36,7 @@ function TopBar() {
   const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
   const setUserInfo = useAppStore((s) => s.setUserInfo);
   const userAccountInfo = useAppStore((s) => s.userInfo);
+  const [open, setOpen] = useState(false);
 
   // Get user ID
   const location = useLocation();
@@ -78,6 +83,11 @@ function TopBar() {
     },
   });
 
+  const handleDelete = () => {
+    deleteAccountMutation.mutate();
+    setOpen(false);
+  };
+
   return (
     <AppBar className="topbar-appBar" position="absolute">
       <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
@@ -117,13 +127,19 @@ function TopBar() {
               Favorites
               </Button>
               <Button variant="outlined" color="error" startIcon={<DeleteForeverIcon /> } 
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to delete your account?')) {
-                    deleteAccountMutation.mutate();
-                  }
-                }}>
+                onClick={() => { setOpen(true); }}>
                 Delete Account
               </Button>
+              <Dialog open={open} onClose={() => setOpen(false)}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                  <Typography>Are you sure you want to delete your account?</Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setOpen(false)}>Cancel</Button>
+                  <Button color="error" onClick={handleDelete}>Delete</Button>
+                </DialogActions>
+              </Dialog>
               <label htmlFor="upload-photo" style={{ display: 'inline-block', cursor: 'pointer' }}>
                 <Button
                   component="span"

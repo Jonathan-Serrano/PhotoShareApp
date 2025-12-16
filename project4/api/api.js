@@ -210,9 +210,9 @@ export const deletePhoto = async (photoId) => {
 };
 
 // Delete Account
-export const deleteAccount = async (userId) => {
+export const deleteAccount = async (userID) => {
   try {
-    const res = await api.delete(`/user/${userId}`);
+    const res = await api.delete(`/user/${userID}`);
     return res.data;
   } catch (err) {
     console.error('Error:', err);

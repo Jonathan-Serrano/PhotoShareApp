@@ -48,21 +48,9 @@ function UserPhotos({ userId }) {
     queryFn: () => fetchFavorites(),
   });
 
-  const handleToggleFavorite = (photo) => {
-    const DateTime = new Date(photo.date_time).toISOString();
+  
 
-    const isFavorite = favorites.some(
-      (f) => String(f.photo_id._id) === String(photo._id),
-    );
-
-    if (isFavorite) {
-      removeFavoriteMutation.mutate(photo._id);
-    } else {
-      addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
-    }
-  };
-
-  const useAddFavorite = (queryClient) => {
+  const useAddFavorite = () => {
 
     return useMutation({
       mutationFn: ({ photoId, DateTime }) => addFavorite(photoId, DateTime),
@@ -85,7 +73,7 @@ function UserPhotos({ userId }) {
     });
   };
 
-  const useRemoveFavorite = (queryClient) => {
+  const useRemoveFavorite = () => {
 
     return useMutation({
       mutationFn: (photoId) => removeFavorite(photoId),
@@ -95,9 +83,7 @@ function UserPhotos({ userId }) {
 
         const prev = queryClient.getQueryData(['favorites']);
 
-        queryClient.setQueryData(['favorites'], (old = []) =>
-          old.filter((f) => String(f.photo_id._id) !== String(photoId)),
-        );
+        queryClient.setQueryData(['favorites'], (old = []) => old.filter((f) => String(f.photo_id._id) !== String(photoId)),);
 
         return { prev };
       },
@@ -105,6 +91,23 @@ function UserPhotos({ userId }) {
         queryClient.invalidateQueries({ queryKey: ['favorites'] });
       },
     });
+  };
+
+  const addFavoriteMutation = useAddFavorite();
+  const removeFavoriteMutation = useRemoveFavorite();
+
+  const handleToggleFavorite = (photo) => {
+    const DateTime = new Date(photo.date_time).toISOString();
+
+    const isFavorite = favorites.some(
+      (f) => String(f.photo_id._id) === String(photo._id),
+    );
+
+    if (isFavorite) {
+      removeFavoriteMutation.mutate(photo._id);
+    } else {
+      addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
+    }
   };
 
 
@@ -147,8 +150,6 @@ function UserPhotos({ userId }) {
     }
   }, [isChecked]);
 
-  const addFavoriteMutation = useAddFavorite(queryClient);
-  const removeFavoriteMutation = useRemoveFavorite(queryClient);
 
   const useDeleteComment = useMutation({
     mutationFn: ({ photoId, commentId }) => deleteComment(photoId, commentId),
@@ -271,10 +272,12 @@ function UserPhotos({ userId }) {
                   <Typography variant="caption" color="text.secondary">
                     {new Date(comment.date_time).toLocaleString()}
                   </Typography>
-                  {userInfo._id === comment.user?._id && (
+                  {userInfo._id === comment.user?._id && 
+                  (
                   <Button color="error" size="small" sx={{ml: 2}} onClick={() => useDeleteComment.mutate({ photoId: photo._id, commentId: comment._id })}>
                     Delete Comment
-                  </Button>)}
+                  </Button>
+                  )}
                 </Box>
               ))
             ) : (
