@@ -16,7 +16,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import './styles.css';
-import { fetchPhotos, addComment } from '../../api/api.js';
+import { fetchPhotos, addComment, deleteComment, deletePhoto } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function UserSinglePhoto({ userId, index}) {
@@ -24,19 +24,23 @@ function UserSinglePhoto({ userId, index}) {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
 
-  // Access isChecked and setIsChecked from Zustand
+  // Access from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
   const setIsChecked = useAppStore((s) => s.setIsChecked);
+  const userInfo = useAppStore((s) => s.userInfo);
 
   //  Set Navigation and flag for first run
   const navigate = useNavigate();
   const firstRun = useRef(true);
 
   // Fetch user photos
-  const { data: photos = [] } = useQuery({
+  const { data: photos = [], isLoading } = useQuery({
     queryKey: ['photos', userId],
     queryFn: () => fetchPhotos(userId),
   });
+
+  const photo = photos?.[index - 1] || {};
+  const photoLength = photos?.length || 0;
 
   const useAddComment = useMutation({
     mutationFn: ({ photoId, comment }) => addComment(photoId, comment),
@@ -51,9 +55,6 @@ function UserSinglePhoto({ userId, index}) {
       onSuccess: () => setCommentText(''),
     });
   };
-
-  const photo = photos?.[index - 1] || {};
-  const photoLength = photos?.length || 0;
 
   // For Moving between pages
   const handlePageChange = (event, value) => {
@@ -75,9 +76,27 @@ function UserSinglePhoto({ userId, index}) {
     }
   }, [isChecked]);
 
+  const useDeleteComment = useMutation({
+    mutationFn: ({ photoId, commentId }) => deleteComment(photoId, commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+    },
+  });
+
+  const deletePhotoMutation = useMutation({
+    mutationFn: (photoId) => deletePhoto(photoId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+      queryClient.invalidateQueries({ queryKey: ['photoCounts'] });
+    },
+  });
+
   return (
     <>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'center' }}>
+        {photoLength > 0 && (
         <Card key={photo._id} sx={{ maxWidth: 500, marginBottom: 2 }}>
           <CardMedia
             component="img"
@@ -89,6 +108,11 @@ function UserSinglePhoto({ userId, index}) {
             <Typography variant="body2" color="text.primary">
               <strong>Posted On:</strong> {new Date(photo.date_time).toLocaleString()}
             </Typography>
+            {userInfo?._id === photo.user_id && (
+            <Button color="error" onClick={() => deletePhotoMutation.mutate(photo._id)}>
+              Delete Photo
+            </Button>
+            )}
             <Typography variant="subtitle1" color="text.primary">
                 Comments:
             </Typography>
@@ -143,6 +167,10 @@ function UserSinglePhoto({ userId, index}) {
                   <Typography variant="caption" color="text.secondary">
                     {new Date(comment.date_time).toLocaleString()}
                   </Typography>
+                  {userInfo._id === comment.user?._id && (
+                  <Button size="small" sx={{ml: 2}} onClick={() => useDeleteComment.mutate({ photoId: photo._id, commentId: comment._id })}>
+                    Delete Comment
+                  </Button>)}
                 </Box>
               ))
             ) : (
@@ -151,10 +179,13 @@ function UserSinglePhoto({ userId, index}) {
               </Typography>
             )}
           </CardContent>
-        </Card>
+        </Card> )}
+        {photos.length === 0 && (<Typography>Users has no photos</Typography>)}
       </Box>
+      {photoLength > 0 && (
       <Pagination sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'center' }}
         count={photoLength} shape="rounded" onChange={handlePageChange} page={parseInt(index, 10)} />
+      )}
     </>
   );
 }

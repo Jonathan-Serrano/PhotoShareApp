@@ -1,4 +1,12 @@
+import { join,dirname } from "path";
+import fs from "fs/promises";
+import { fileURLToPath } from "url";
 import User from "../schema/user.js";
+import Photo from "../schema/photo.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const ROOT_DIR = join(__dirname, "..");
 
 export const base = (request, response) => {
   response.send("Simple web server of files from " + __dirname);
@@ -78,5 +86,51 @@ export const user = async (req, res) => {
 
   } catch (err) {
     return res.status(500).send({ error: "Server error" });
+  }
+};
+
+
+/**
+ * DELETE URL /user/:userId - delete an account.
+ */
+export const userDeletion = async (request, response) => {  
+  try {
+    const sessionUserId = request.session.user._id; 
+    const { userId } = request.params;
+    console.log(sessionUserId)
+    console.log(userId)
+
+
+    if (sessionUserId !== userId) {
+      return response.status(403).json({ error: "Cannot delete account not belonging to you" });
+    }
+
+    const userPhotos = await Photo.find({ user_id: userId });
+
+    // Delete Photos 
+
+    await Photo.deleteMany({ user_id: userId });
+
+    for (const photo of userPhotos) {
+      const filePath = join(ROOT_DIR, "images", photo.file_name);
+      try {
+        await fs.unlink(filePath);
+      } catch (err) {
+        console.warn("file not found", err.message);
+      }
+    }
+
+    // Delete Comments:
+    await Photo.updateMany( {}, { $pull: { comments: { user_id: userId } } });
+
+    // Delete User:
+    await User.deleteOne({ _id: userId });
+
+    // Destroy Session
+    request.session.destroy(() => {});
+
+    return response.status(200).json({message: "Account was deleted sucessfully"});
+  } catch (err) {
+    return response.status(500).json({ error: "Server error" });
   }
 };

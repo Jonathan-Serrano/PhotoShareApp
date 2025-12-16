@@ -14,10 +14,10 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import session from "express-session";
 import { login, currentUser, logout } from "./controllers/adminController.js";
-import { commentsOfPhotos, commentDetails, commentCounts } from "./controllers/commentController.js";
-import { userPhotos, photoCounts, userPhotoUpload } from "./controllers/photoController.js";
+import { commentsOfPhotos, commentDetails, commentCounts, commentDeletion } from "./controllers/commentController.js";
+import { userPhotos, photoCounts, userPhotoUpload, photoDeletion } from "./controllers/photoController.js";
 import { info, counts } from "./controllers/testController.js";
-import { base, userList, userId, user } from "./controllers/userController.js";
+import { base, userList, userId, user, userDeletion} from "./controllers/userController.js";
 
 // ToDO - Your submission should work without this line. Comment out or delete this line for tests and before submission!
 // import models from "./modelData/photoApp.js";
@@ -91,16 +91,19 @@ app.get("/", requireLogin, base);
 app.get("/user/list", requireLogin, userList);
 app.get("/user/:id", requireLogin, userId);
 app.post("/user", user);
+app.delete("/user/:userId", requireLogin, userDeletion);
 
 // Photo Controller
 app.get("/photosOfUser/:id", requireLogin, userPhotos);
 app.get("/usersPhotoCounts", requireLogin, photoCounts);
 app.post("/photos/new", requireLogin, upload.single("uploadedphoto"), userPhotoUpload);
+app.delete("/photoDeletion/:photoId", requireLogin, photoDeletion);
 
 // Comment Controller
 app.post("/commentsOfPhoto/:photo_id", requireLogin, commentsOfPhotos);
 app.get("/usersCommentDetails/:id", requireLogin, commentDetails);
 app.get("/usersCommentCounts", requireLogin, commentCounts);
+app.delete("/commentDeletion/:photoId/:commentId", requireLogin, commentDeletion);
 
 
 const server = app.listen(portno, function () {

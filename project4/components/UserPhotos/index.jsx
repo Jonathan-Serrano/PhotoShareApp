@@ -15,7 +15,7 @@ import {
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import './styles.css';
-import { fetchPhotos, addComment } from '../../api/api.js';
+import { fetchPhotos, addComment, deleteComment, deletePhoto } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function UserPhotos({ userId }) {
@@ -23,8 +23,9 @@ function UserPhotos({ userId }) {
   const queryClient = useQueryClient();
   const [commentTextById, setCommentTextById] = useState({});
 
-  // Access isChecked from Zustand
+  // Access from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
+  const userInfo = useAppStore((s) => s.userInfo);
 
   // Set Navigation
   const navigate = useNavigate();
@@ -58,6 +59,23 @@ function UserPhotos({ userId }) {
     }
   }, [isChecked]);
 
+  const useDeleteComment = useMutation({
+    mutationFn: ({ photoId, commentId }) => deleteComment(photoId, commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+    },
+  });
+
+  const deletePhotoMutation = useMutation({
+    mutationFn: (photoId) => deletePhoto(photoId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+      queryClient.invalidateQueries({ queryKey: ['photoCounts'] });
+    },
+  });
+
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'center' }}>
       {photos.length > 0 && (photos.map((photo) => (
@@ -72,6 +90,11 @@ function UserPhotos({ userId }) {
             <Typography variant="body2" color="text.primary">
               <strong>Posted On:</strong> {new Date(photo.date_time).toLocaleString()}
             </Typography>
+            {userInfo?._id === photo.user_id && (
+            <Button color="error" onClick={() => deletePhotoMutation.mutate(photo._id)}>
+              Delete Photo
+            </Button>
+            )}
             <Typography variant="subtitle1" color="text.primary">
               Comments:
             </Typography>
@@ -131,6 +154,10 @@ function UserPhotos({ userId }) {
                   <Typography variant="caption" color="text.secondary">
                     {new Date(comment.date_time).toLocaleString()}
                   </Typography>
+                  {userInfo._id === comment.user?._id && (
+                  <Button color="error" size="small" sx={{ml: 2}} onClick={() => useDeleteComment.mutate({ photoId: photo._id, commentId: comment._id })}>
+                    Delete Comment
+                  </Button>)}
                 </Box>
               ))
             ) : (
@@ -141,6 +168,7 @@ function UserPhotos({ userId }) {
           </CardContent>
         </Card>
       )))}
+      {photos.length === 0 && (<Typography>Users has no photos</Typography>)}
     </Box>
   );
 }

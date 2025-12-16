@@ -12,10 +12,11 @@ import {
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 
 import './styles.css';
-import { fetchUser, logoutOfAccount, uploadPhoto } from '../../api/api.js';
+import { fetchUser, logoutOfAccount, uploadPhoto, deleteAccount } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function TopBar() {
@@ -63,6 +64,19 @@ function TopBar() {
     },
   });
 
+  const deleteAccountMutation = useMutation({
+    mutationFn: () => deleteAccount(userAccountInfo._id), 
+    onSuccess: () => {
+      // Clear session state and redirect to login
+      setUserInfo(null);
+      setIsLoggedIn(false);
+      navigate('/login');
+    },
+    onError: (err) => {
+      console.error('Error deleting account:', err);
+    },
+  });
+
   return (
     <AppBar className="topbar-appBar" position="absolute">
       <Toolbar sx={{ display: 'flex', alignItems: 'center' }}>
@@ -93,6 +107,14 @@ function TopBar() {
                   }
                 }}
               />
+              <Button variant="outlined" color="error" startIcon={<DeleteForeverIcon /> } 
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to delete your account?')) {
+                    deleteAccountMutation.mutate();
+                  }
+                }}>
+                Delete Account
+              </Button>
               <label htmlFor="upload-photo" style={{ display: 'inline-block', cursor: 'pointer' }}>
                 <Button
                   component="span"

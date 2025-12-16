@@ -25,7 +25,7 @@ export const userPhotos = async (request, response) => {
       .lean();
 
     // If no photos found
-    if (!photos || photos.length === 0) {
+    if (!photos) {
       return response.status(400).send({ error: "Photos not found" });
     }
 
@@ -128,6 +128,42 @@ export const userPhotoUpload = async (request, response) => {
     await newPhoto.save();
 
     return response.status(200).json(newPhoto);
+  } catch (err) {
+    return response.status(500).json({ error: "Server error" });
+  }
+};
+
+
+/**
+ * DELETE URL /photoDeletion/:photoId - delete a photo.
+ */
+export const photoDeletion = async (request, response) => {  
+  try {
+    const userId = request.session.user._id;
+    const { photoId } = request.params;
+
+    const photo = await Photo.findOneAndDelete({
+      _id: photoId,
+      user_id: userId,
+    });
+
+    if (!photo) {
+      return response.status(403).json({
+        error: "Photo not found",
+      });
+    }
+
+    // Path 
+    const filePath = join(ROOT_DIR, "images", photo.file_name);
+
+    // Delete File
+    try {
+      await fs.unlink(filePath);
+    } catch (err) {
+      console.warn("file not found", err.message);
+    }
+
+    return response.status(200).json({message: "Comment was deleted sucessfully"});
   } catch (err) {
     return response.status(500).json({ error: "Server error" });
   }

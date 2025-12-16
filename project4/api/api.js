@@ -128,6 +128,17 @@ export const addComment = async (photoId, comment) => {
   }
 };
 
+// Delete Comment
+export const deleteComment = async (photoId, commentId) => {
+  try {
+    const res = await api.delete(`/commentDeletion/${photoId}/${commentId}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
 // Upload photo
 export const uploadPhoto = async (file) => {
   try {
@@ -147,3 +158,26 @@ export const uploadPhoto = async (file) => {
     throw err;
   }
 };
+
+// Delete Photo
+export const deletePhoto = async (photoId) => {
+  try {
+    const res = await api.delete(`/PhotoDeletion/${photoId}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
+// Delete Photo
+export const deleteAccount = async (userId) => {
+  try {
+    const res = await api.delete(`/user/${userId}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err);
+    throw err;
+  }
+};
+
