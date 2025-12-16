@@ -5,7 +5,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// ------------ GET REQUESTS ------------
 export const fetchUsers = async () => {
   try {
     const res = await api.get('/user/list');
@@ -42,6 +41,16 @@ export const fetchComments = async (userId) => {
     return res.data;
   } catch (err) {
     console.error('Error:', err);
+    throw err;
+  }
+};
+
+export const fetchMentions = async (userId) => {
+  try {
+    const res = await api.get(`/usersMentions/${encodeURIComponent(userId)}`);
+    return res.data;
+  } catch (err) {
+    console.error('Error:', err.response?.data || err.message);
     throw err;
   }
 };
@@ -118,9 +127,9 @@ export const registerAccount = async (loginName, password, firstName, lastName, 
 };
 
 // Comments
-export const addComment = async (photoId, comment) => {
+export const addComment = async (photoId, comment, mentions = []) => {
   try {
-    const res = await api.post(`/commentsOfPhoto/${photoId}`, { comment });
+    const res = await api.post(`/commentsOfPhoto/${photoId}`, { comment, mentions });
     return res.data;
   } catch (err) {
     console.error('Error:', err);
