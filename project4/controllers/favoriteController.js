@@ -60,4 +60,4 @@ export async function removeFavorite(req, res) {
     console.error("Error removing favorite:", err);
     return res.status(500).send({ error: "Remove Fav Error" });
   }
-};
+}

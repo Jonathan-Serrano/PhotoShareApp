@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   FormGroup,
@@ -9,14 +9,19 @@ import {
   Typography,
   Box,
   Button,
+  Dialog, 
+  DialogTitle, 
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LogoutIcon from '@mui/icons-material/Logout';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 import './styles.css';
-import { fetchUser, logoutOfAccount, uploadPhoto } from '../../api/api.js';
+import { fetchUser, logoutOfAccount, uploadPhoto, deleteAccount } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 
 function TopBar() {
@@ -31,6 +36,7 @@ function TopBar() {
   const setIsLoggedIn = useAppStore((s) => s.setIsLoggedIn);
   const setUserInfo = useAppStore((s) => s.setUserInfo);
   const userAccountInfo = useAppStore((s) => s.userInfo);
+  const [open, setOpen] = useState(false);
 
   // Get user ID
   const location = useLocation();
@@ -63,6 +69,24 @@ function TopBar() {
       queryClient.invalidateQueries({ queryKey: ['photoCounts'] });
     },
   });
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: () => deleteAccount(userAccountInfo._id), 
+    onSuccess: () => {
+      // Clear session state and redirect to login
+      setUserInfo(null);
+      setIsLoggedIn(false);
+      navigate('/login');
+    },
+    onError: (err) => {
+      console.error('Error deleting account:', err);
+    },
+  });
+
+  const handleDelete = () => {
+    deleteAccountMutation.mutate();
+    setOpen(false);
+  };
 
   return (
     <AppBar className="topbar-appBar" position="absolute">
@@ -102,6 +126,20 @@ function TopBar() {
               >
               Favorites
               </Button>
+              <Button variant="outlined" color="error" startIcon={<DeleteForeverIcon /> } 
+                onClick={() => { setOpen(true); }}>
+                Delete Account
+              </Button>
+              <Dialog open={open} onClose={() => setOpen(false)}>
+                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogContent>
+                  <Typography>Are you sure you want to delete your account?</Typography>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setOpen(false)}>Cancel</Button>
+                  <Button color="error" onClick={handleDelete}>Delete</Button>
+                </DialogActions>
+              </Dialog>
               <label htmlFor="upload-photo" style={{ display: 'inline-block', cursor: 'pointer' }}>
                 <Button
                   component="span"

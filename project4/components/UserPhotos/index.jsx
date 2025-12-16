@@ -18,7 +18,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { MentionsInput, Mention } from 'react-mentions';
 
 import './styles.css';
-import { fetchPhotos, addComment, fetchFavorites, addFavorite, removeFavorite, fetchUsers } from '../../api/api.js';
+import { fetchPhotos, addComment, fetchFavorites, addFavorite, removeFavorite, fetchUsers, deleteComment, deletePhoto } from '../../api/api.js';
 import useAppStore from '../../store/useAppStore.js';
 import mentionStyle from '../mentionStyle.js';
 import mentionsInputStyle from '../mentionsInputStyle.js';
@@ -30,8 +30,9 @@ function UserPhotos({ userId }) {
   const [commentValueById, setCommentValueById] = useState({});
   const [mentionsById, setMentionsById] = useState({});
 
-  // Access isChecked from Zustand
+  // Access from Zustand
   const isChecked = useAppStore((s) => s.isChecked);
+  const userInfo = useAppStore((s) => s.userInfo);
 
   // Set Navigation
   const navigate = useNavigate();
@@ -47,21 +48,9 @@ function UserPhotos({ userId }) {
     queryFn: () => fetchFavorites(),
   });
 
-  const handleToggleFavorite = (photo) => {
-    const DateTime = new Date(photo.date_time).toISOString();
+  
 
-    const isFavorite = favorites.some(
-      (f) => String(f.photo_id._id) === String(photo._id),
-    );
-
-    if (isFavorite) {
-      removeFavoriteMutation.mutate(photo._id);
-    } else {
-      addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
-    }
-  };
-
-  const useAddFavorite = (queryClient) => {
+  const useAddFavorite = () => {
 
     return useMutation({
       mutationFn: ({ photoId, DateTime }) => addFavorite(photoId, DateTime),
@@ -84,7 +73,7 @@ function UserPhotos({ userId }) {
     });
   };
 
-  const useRemoveFavorite = (queryClient) => {
+  const useRemoveFavorite = () => {
 
     return useMutation({
       mutationFn: (photoId) => removeFavorite(photoId),
@@ -94,9 +83,7 @@ function UserPhotos({ userId }) {
 
         const prev = queryClient.getQueryData(['favorites']);
 
-        queryClient.setQueryData(['favorites'], (old = []) =>
-          old.filter((f) => String(f.photo_id._id) !== String(photoId)),
-        );
+        queryClient.setQueryData(['favorites'], (old = []) => old.filter((f) => String(f.photo_id._id) !== String(photoId)),);
 
         return { prev };
       },
@@ -104,6 +91,23 @@ function UserPhotos({ userId }) {
         queryClient.invalidateQueries({ queryKey: ['favorites'] });
       },
     });
+  };
+
+  const addFavoriteMutation = useAddFavorite();
+  const removeFavoriteMutation = useRemoveFavorite();
+
+  const handleToggleFavorite = (photo) => {
+    const DateTime = new Date(photo.date_time).toISOString();
+
+    const isFavorite = favorites.some(
+      (f) => String(f.photo_id._id) === String(photo._id),
+    );
+
+    if (isFavorite) {
+      removeFavoriteMutation.mutate(photo._id);
+    } else {
+      addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
+    }
   };
 
 
@@ -146,8 +150,23 @@ function UserPhotos({ userId }) {
     }
   }, [isChecked]);
 
-  const addFavoriteMutation = useAddFavorite(queryClient);
-  const removeFavoriteMutation = useRemoveFavorite(queryClient);
+
+  const useDeleteComment = useMutation({
+    mutationFn: ({ photoId, commentId }) => deleteComment(photoId, commentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+    },
+  });
+
+  const deletePhotoMutation = useMutation({
+    mutationFn: (photoId) => deletePhoto(photoId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['photos', userId] });
+      queryClient.invalidateQueries({ queryKey: ['commentCounts'] });
+      queryClient.invalidateQueries({ queryKey: ['photoCounts'] });
+    },
+  });
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'center' }}>
@@ -165,6 +184,11 @@ function UserPhotos({ userId }) {
                 <Typography variant="body2" color="text.primary">
                   <strong>Posted On:</strong> {new Date(photo.date_time).toLocaleString()}
                 </Typography>
+                {userInfo?._id === photo.user_id && (
+                <Button color="error" onClick={() => deletePhotoMutation.mutate(photo._id)}>
+                  Delete Photo
+                </Button>
+                )}
                 <Typography variant="subtitle1" color="text.primary">
                   Comments:
                 </Typography>
@@ -248,6 +272,12 @@ function UserPhotos({ userId }) {
                   <Typography variant="caption" color="text.secondary">
                     {new Date(comment.date_time).toLocaleString()}
                   </Typography>
+                  {userInfo._id === comment.user?._id && 
+                  (
+                  <Button color="error" size="small" sx={{ml: 2}} onClick={() => useDeleteComment.mutate({ photoId: photo._id, commentId: comment._id })}>
+                    Delete Comment
+                  </Button>
+                  )}
                 </Box>
               ))
             ) : (
@@ -258,6 +288,7 @@ function UserPhotos({ userId }) {
           </CardContent>
         </Card>
       )))}
+      {photos.length === 0 && (<Typography>Users has no photos</Typography>)}
     </Box>
   );
 }

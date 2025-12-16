@@ -128,3 +128,34 @@ export const commentCounts = async (request, response) => {
     return response.status(400).json({ error: "Comments of user error" });
   }
 };
+
+/**
+ * DELETE URL /comentDeletion/:photoId/:commentId - delete a comment to a photo.
+ */
+export const commentDeletion = async (request, response) => {  
+  try {
+    const userId = request.session.user._id;
+    const { photoId, commentId } = request.params;
+
+    const photo = await Photo.findOne({ _id: photoId, "comments._id": commentId }, { "comments.$": 1 } );
+
+    if (!photo || !photo.comments || photo.comments.length === 0) {
+      return response.status(400).send({ error: "Could not delete comment" });
+    }
+    
+    await Photo.updateOne(
+      {
+        _id: photoId,
+        "comments._id": commentId,
+        "comments.user_id": userId,
+      },
+      {
+        $pull: { comments: { _id: commentId } }
+      }
+    );
+
+    return response.status(200).json({message: "Comment was deleted sucessfully"});
+  } catch (err) {
+    return response.status(500).json({ error: "Server error" });
+  }
+};
