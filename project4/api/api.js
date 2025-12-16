@@ -150,7 +150,7 @@ export const uploadPhoto = async (file) => {
 
 export const fetchFavorites = async () => {
   try {
-    const res = await api.get(`/favoriteCheck`);
+    const res = await api.get('/favoriteCheck');
     return res.data;
   } catch (err) {
     console.error('Error:', err);
@@ -167,7 +167,6 @@ export const addFavorite = async (photoId, DateTime) => {
     throw err;
   }
 };
- 
 
 export const removeFavorite = async (photoId) => {
   try {

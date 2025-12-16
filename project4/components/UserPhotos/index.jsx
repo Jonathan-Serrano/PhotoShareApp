@@ -46,7 +46,7 @@ function UserPhotos({ userId }) {
     const DateTime = new Date(photo.date_time).toISOString();
 
     const isFavorite = favorites.some(
-      (f) => String(f.photo_id._id) === String(photo._id)
+      (f) => String(f.photo_id._id) === String(photo._id),
     );
 
     if (isFavorite) {
@@ -74,8 +74,8 @@ function UserPhotos({ userId }) {
         return { prev };
       },
       onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites'] });
-    },
+        queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      },
     });
   };
 
@@ -90,7 +90,7 @@ function UserPhotos({ userId }) {
         const prev = queryClient.getQueryData(['favorites']);
 
         queryClient.setQueryData(['favorites'], (old = []) =>
-          old.filter((f) => String(f.photo_id._id) !== String(photoId))
+          old.filter((f) => String(f.photo_id._id) !== String(photoId)),
         );
 
         return { prev };

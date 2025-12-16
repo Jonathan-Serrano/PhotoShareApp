@@ -1,4 +1,3 @@
-import Photo from "../schema/photo.js";
 import Favorite from "../schema/favorite.js";
 
 
@@ -9,11 +8,11 @@ export const favoriteCheckList = async (request, response) => {
 
   try {
     // Find all favorites photos by user
-    const favs = await Favorite.find({ "user_id": request.session.user._id })
+    const favs = await Favorite.find({ user_id: request.session.user._id })
       .select("_id user_id photo_id date_time")
       .populate({
-          path: "photo_id",       
-          select: "file_name",     
+        path: "photo_id",
+        select: "file_name",
       });
     return response.status(200).json(favs);
   } catch (err) {
@@ -58,7 +57,7 @@ export async function removeFavorite(req, res) {
 
     return res.status(200).send({ message: "Removed from favorites" });
   } catch (err) {
-    console.error('Error removing favorite:', err);
-    return res.status(500).send({ error: 'Remove Fav Error' });
+    console.error("Error removing favorite:", err);
+    return res.status(500).send({ error: "Remove Fav Error" });
   }
 };

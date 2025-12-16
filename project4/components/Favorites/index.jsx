@@ -1,6 +1,5 @@
 import React, { useState }  from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import PropTypes from 'prop-types';
 import {
   Typography,
   List,
@@ -10,14 +9,15 @@ import {
   Box,
   IconButton,
 } from '@mui/material';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchFavorites, removeFavorite } from '../../api/api.js';
 import CloseIcon from '@mui/icons-material/Close';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import { fetchFavorites, removeFavorite } from '../../api/api.js';
 import './styles.css';
 
 
 
-function Favorites({ userId }) {
+function Favorites() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
@@ -33,8 +33,8 @@ function Favorites({ userId }) {
   };
 
   const { data: favorites = [] } = useQuery({
-      queryKey: ['favorites'],
-      queryFn: () => fetchFavorites(),
+    queryKey: ['favorites'],
+    queryFn: () => fetchFavorites(),
   });
 
   // Mutation to remove favorite
@@ -53,8 +53,8 @@ function Favorites({ userId }) {
     <>
       <List sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: 2, justifyContent: 'flex-start' }}>
         {favorites.length > 0 && (favorites.map((favorite) => (
-          <Card key={favorite.photo_id._id} sx={{ maxWidth: 200, marginBottom: 2, position: 'relative', }} onClick={() => handleOpen(favorite)}>
-            <IconButton  onClick={(e) => handleRemove(favorite, e)} sx={{position: 'absolute', top: 4, right: 4, zIndex: 10, backgroundColor: 'white', '&:hover': { backgroundColor: 'white'}  }}>
+          <Card key={favorite.photo_id._id} sx={{ maxWidth: 200, marginBottom: 2, position: 'relative' }} onClick={() => handleOpen(favorite)}>
+            <IconButton onClick={(e) => handleRemove(favorite, e)} sx={{position: 'absolute', top: 4, right: 4, zIndex: 10, backgroundColor: 'white', '&:hover': { backgroundColor: 'white'}  }}>
               <CloseIcon fontSize="small" />
             </IconButton>
 
@@ -74,16 +74,17 @@ function Favorites({ userId }) {
       >
         <Box sx={{ marginBottom: 2, position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', outline: 'none' }}>
           {selectedPhoto && selectedPhoto.photo_id &&  (
-          <Card >
-            <CardMedia
-              component='img'
-              image={`/images/${selectedPhoto.photo_id.file_name}`}
-              alt={selectedPhoto.photo_id.file_name}
-            />
-            <Typography variant="h6" align="center" sx={{ mt: 2 }}>
+            <Card>
+              <CardMedia
+                component="img"
+                image={`/images/${selectedPhoto.photo_id.file_name}`}
+                alt={selectedPhoto.photo_id.file_name}
+              />
+              <Typography variant="h6" align="center" sx={{ mt: 2 }}>
                 <strong>Posted On:</strong> {new Date(selectedPhoto.date_time).toLocaleString()}
-            </Typography>
-          </Card>)}
+              </Typography>
+            </Card>
+          )}
         </Box>
       </Modal>
     </>

@@ -58,7 +58,7 @@ function UserSinglePhoto({ userId, index}) {
       addFavoriteMutation.mutate({ photoId: photo._id, DateTime });
     }
   };
-  
+
   const useAddFavorite = (queryClient) => {
 
     return useMutation({
@@ -77,11 +77,11 @@ function UserSinglePhoto({ userId, index}) {
         return { prev };
       },
       onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites'] });
-    },
+        queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      },
     });
   };
-  
+
   const useRemoveFavorite = (queryClient) => {
 
     return useMutation({
@@ -93,7 +93,7 @@ function UserSinglePhoto({ userId, index}) {
         const prev = queryClient.getQueryData(['favorites']);
 
         queryClient.setQueryData(['favorites'], (old = []) =>
-          old.filter((f) => String(f.photo_id._id) !== String(photoId))
+          old.filter((f) => String(f.photo_id._id) !== String(photoId)),
         );
 
         return { prev };
